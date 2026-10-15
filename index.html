@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Harsh Kaptan</title>
+<meta name="description" content="Harsh Kaptan: AI Associate at Weam.ai. I build where AI, automation and real business problems meet." />
+<meta name="theme-color" content="#050506" />
+<meta name="referrer" content="strict-origin-when-cross-origin" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-eval' 'sha256-lAovHhyes/7n1bD9xaYXvnLUoA5IHaUiJETjJbJFdUE=' https://open.spotify.com https://embed-cdn.spotifycdn.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://abacus.jasoncameron.dev; frame-src https://open.spotify.com https://cal.com; object-src 'none'; base-uri 'self'; form-action 'none'; upgrade-insecure-requests" />
+<link rel="icon" type="image/png" href="assets/favicon.png" />
+<link rel="preload" href="assets/fonts/Geist-Variable.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="assets/fonts/GeistPixel-Grid.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" as="image" type="image/webp" href="assets/banner-800.webp" imagesrcset="assets/banner-800.webp 800w, assets/banner-1600.webp 1600w" imagesizes="(max-width: 760px) 100vw, 758px" fetchpriority="high" />
+<link rel="stylesheet" href="assets/style.css" />
+<script>
+  // Apply the saved theme before paint so there is no flash. Dark is the default.
+  (function () {
+    let t = 'dark';
+    try { t = localStorage.getItem('theme') || 'dark'; } catch (e) {}
+    document.documentElement.setAttribute('data-theme', t);
+  })();
+</script>
+</head>
+<body>
+
+<nav class="top">
+  <div class="inner">
+    <a href="#home" class="logo">HK<span style="color:var(--accent)">.</span></a>
+    <div class="nav-links">
+      <a href="#about" class="hide-sm">About</a>
+      <a href="#experience" class="hide-sm">Work</a>
+      <a href="#projects" class="hide-sm">Projects</a>
+      <a href="#contact">Contact</a>
+      <a href="favourites.html">Favourites</a>
+      <button class="search-btn" id="cmdk-open" aria-label="Search and commands" data-tip="Search (⌘K)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <kbd class="kbd mod-key">⌘</kbd><kbd class="kbd">K</kbd>
+      </button>
+      <button class="icon-btn theme-toggle" aria-label="Toggle theme">
+        <svg class="theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+        <svg class="theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<div class="clip">
+<main class="page" id="home">
+
+  <!-- ================= HERO ================= -->
+  <div class="banner">
+    <img src="assets/banner-800.webp" srcset="assets/banner-800.webp 800w, assets/banner-1600.webp 1600w" sizes="(max-width: 760px) 100vw, 758px" alt="Humans are busy, machines are learning." width="1600" height="595" fetchpriority="high" />
+    <span class="cross l"></span><span class="cross r"></span>
+  </div>
+  <section class="hero">
+    <div class="hero-row">
+      <div class="avatar"><img src="assets/avatar.webp" alt="Harsh Kaptan" width="256" height="256" fetchpriority="high" /></div>
+      <div class="hero-meta">
+        <div class="whoami mono">$whoami <span class="views" title="Page views"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg><span id="view-count">—</span></span></div>
+        <div class="name-row">
+          <h1 class="name">Harsh Kaptan</h1>
+          <svg class="verified" viewBox="0 0 24 24" aria-label="Verified"><path fill="var(--accent)" d="M22.5 12.5c0-1.58-.875-2.95-2.148-3.6.154-.435.238-.905.238-1.4 0-2.21-1.71-3.998-3.818-3.998-.47 0-.92.084-1.336.25C14.818 2.415 13.51 1.5 12 1.5s-2.816.917-3.437 2.25c-.415-.165-.866-.25-1.336-.25-2.11 0-3.818 1.79-3.818 4 0 .494.083.964.237 1.4-1.272.65-2.147 2.018-2.147 3.6 0 1.495.782 2.798 1.942 3.486-.02.17-.032.34-.032.514 0 2.21 1.708 4 3.818 4 .47 0 .92-.086 1.335-.25.62 1.334 1.926 2.25 3.437 2.25 1.512 0 2.818-.916 3.437-2.25.415.163.865.248 1.336.248 2.11 0 3.818-1.79 3.818-4 0-.174-.012-.344-.033-.513 1.158-.687 1.943-1.99 1.943-3.484z"/><path fill="#fff" d="M10.54 16.2 6.8 12.46l1.41-1.41 2.33 2.32 5.25-5.25 1.41 1.41z"/></svg>
+        </div>
+        <div class="tagline mono"><span id="typed"></span><span class="caret"></span></div>
+      </div>
+      <div class="hero-socials">
+        <a class="icon-btn" href="https://x.com/harshkaptan" target="_blank" rel="noopener" aria-label="X"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.9 2H22l-7.6 8.7L23.3 22h-7l-5.5-7.2L4.5 22H1.4l8.1-9.3L1 2h7.2l5 6.6L18.9 2Zm-1.2 18h1.7L7.4 3.9H5.6L17.7 20Z"/></svg></a>
+        <a class="icon-btn" href="https://www.linkedin.com/in/harsh-kaptan-ab0a1a253" target="_blank" rel="noopener" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13ZM7.12 20.45H3.56V9h3.56v11.45ZM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0Z"/></svg></a>
+        <a class="icon-btn" href="https://github.com/harshkaptan" target="_blank" rel="noopener" aria-label="GitHub"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .3a12 12 0 0 0-3.8 23.38c.6.12.83-.26.83-.57L9 21.07c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.08-.74.09-.73.09-.73 1.2.09 1.83 1.24 1.83 1.24 1.07 1.83 2.81 1.3 3.5 1 .1-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.64 1.66.24 2.88.12 3.18a4.65 4.65 0 0 1 1.23 3.22c0 4.61-2.8 5.63-5.48 5.92.42.36.81 1.1.81 2.22l-.01 3.29c0 .31.2.69.82.57A12 12 0 0 0 12 .3Z"/></svg></a>
+      </div>
+    </div>
+
+    <div class="status"><span>AI Associate @ <strong style="color:var(--text);font-weight:500">Weam.ai</strong></span></div>
+
+    <div class="intro">
+      <p>22. Engineer. Mostly <strong style="color:var(--text);font-weight:500">yapping about AI &amp; Web3</strong>, occasionally shipping it.</p>
+    </div>
+
+    <div class="cta-row">
+      <button class="btn primary book-call">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        Book a 30-min call
+      </button>
+      <a class="btn" href="mailto:harshkaptan@gmail.com">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>
+        Email
+      </a>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ================= ABOUT ================= -->
+  <section id="about" class="reveal">
+    <h2>About</h2>
+    <div class="terminal">
+      <div class="terminal-head">
+        <div class="lights">
+          <button class="light red" data-act="close" aria-label="Close terminal" data-tip="Close"><svg viewBox="0 0 10 10"><path d="M3 3l4 4M7 3l-4 4"/></svg></button>
+          <button class="light yellow" data-act="min" aria-label="Minimise terminal" data-tip="Minimise"><svg viewBox="0 0 10 10"><path d="M2.5 5h5"/></svg></button>
+          <button class="light green" data-act="max" aria-label="Expand terminal" data-tip="Expand"><svg viewBox="0 0 10 10"><path d="M3 6.6V3h3.6zM7 3.4V7H3.4z" fill="currentColor" stroke="none"/></svg></button>
+        </div>
+        <span>~/harsh — zsh</span>
+      </div>
+      <div class="terminal-body"><div class="tb-inner">
+        <div><span style="color:var(--green)">harsh</span>:</div>
+        <div class="row"><span class="k">focus:</span><span class="v">ai workflows, automation &amp; applied llms</span></div>
+        <div class="row"><span class="k">building:</span><span class="v">ai for franchise &amp; multi-unit brands @ weam.ai</span></div>
+        <div class="row"><span class="k">exploring:</span><span class="v">ai agents · web3 · product</span></div>
+        <div class="row"><span class="k">offline:</span><span class="v">music, networking &amp; trying to build a good physique</span></div>
+        <div><span class="v">_</span></div>
+      </div></div>
+    </div>
+
+    <ul class="about-lines">
+      <li><b>Day job:</b> AI associate at Weam.ai. I help franchise brands replace 40 open spreadsheet tabs with stuff that just works.</li>
+      <li><b>The test:</b> developer by background, so I only ask one question. Does it survive Monday morning, or just the demo?</li>
+      <li><b>Bad habit:</b> I try every AI tool the week it drops. Most get uninstalled. The good ones get a tweet.</li>
+      <li><b>Side quests:</b> hackathons, Web3 rabbit holes, and podcast notes nobody asked for.</li>
+      <li><b>Currently:</b> missing Gandhi ji. In my wallet.</li>
+      <li><b>The plan:</b> hustle till this section isn't needed.</li>
+    </ul>
+
+    <div class="about-grid">
+      <div class="photo-card">
+        <img src="assets/working.webp" alt="Harsh working on a laptop" width="520" height="926" loading="lazy" decoding="async" />
+        <span class="cap">shipping something ☕</span>
+      </div>
+      <div class="music-card" id="music-card">
+        <div class="music-head">
+          <span class="live"><span class="eq"><b></b><b></b><b></b></span> <span id="music-status">On repeat</span></span>
+          <a href="https://open.spotify.com/user/31jpagslf3q52ahn73ktglerunxm" target="_blank" rel="noopener" style="color:var(--green)" aria-label="Spotify profile">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0a12 12 0 1 0 0 24 12 12 0 0 0 0-24Zm5.5 17.3a.75.75 0 0 1-1.03.25c-2.82-1.72-6.37-2.11-10.55-1.16a.75.75 0 1 1-.33-1.46c4.57-1.04 8.5-.6 11.66 1.34.36.22.47.68.25 1.03Zm1.47-3.27a.94.94 0 0 1-1.29.31c-3.23-1.98-8.15-2.56-11.97-1.4a.94.94 0 1 1-.54-1.8c4.36-1.32 9.78-.68 13.49 1.6.44.27.58.85.31 1.29Zm.13-3.4C15.23 8.33 8.86 8.12 5.17 9.24a1.13 1.13 0 1 1-.65-2.16c4.23-1.28 11.27-1.03 15.72 1.61a1.13 1.13 0 0 1-1.15 1.94Z"/></svg>
+          </a>
+        </div>
+        <div id="spotify-embed"></div>
+        <div class="music-hint" id="music-hint">Blinding Lights starts when you first tap or click the page.</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ================= TECH STACK ================= -->
+  <section id="stack" class="reveal">
+    <h2>Tech Stack</h2>
+
+    <div class="stack-group">
+      <div class="stack-label">Languages</div>
+      <div class="chips">
+        <span class="chip"><img width="18" height="18" loading="lazy" src="assets/icons/python-original.svg" alt="">Python</span>
+        <span class="chip"><img width="18" height="18" loading="lazy" src="assets/icons/javascript-original.svg" alt="">JavaScript</span>
+        <span class="chip"><img width="18" height="18" loading="lazy" src="assets/icons/html5-original.svg" alt="">HTML</span>
+        <span class="chip"><img width="18" height="18" loading="lazy" src="assets/icons/css3-original.svg" alt="">CSS</span>
+        <span class="chip"><img width="18" height="18" loading="lazy" src="assets/icons/azuresqldatabase-original.svg" alt="">SQL</span>
+      </div>
+    </div>
+
+    <div class="stack-group">
+      <div class="stack-label">Frontend</div>
+      <div class="chips">
+        <span class="chip"><img width="18" height="18" loading="lazy" src="assets/icons/react-original.svg" alt="">React</span>
+        <span class="chip"><img class="invert-dark" width="18" height="18" loading="lazy" src="assets/icons/nextjs-original.svg" alt="">Next.js</span>
+        <span class="chip"><img width="18" height="18" loading="lazy" src="assets/icons/typescript-original.svg" alt="">TypeScript</span>
+        <span class="chip"><img width="18" height="18" loading="lazy" src="assets/icons/tailwindcss-original.svg" alt="">Tailwind CSS</span>
+      </div>
+    </div>
+
+    <div class="stack-group">
+      <div class="stack-label">Backend &amp; Data</div>
+      <div class="chips">
+        <span class="chip"><img width="18" height="18" loading="lazy" src="assets/icons/fastapi-original.svg" alt="">FastAPI</span>
+        <span class="chip"><img width="18" height="18" loading="lazy" src="assets/icons/nodejs-original.svg" alt="">Node.js</span>
+        <span class="chip"><img width="18" height="18" loading="lazy" src="assets/icons/pydantic.svg" alt="">Pydantic</span>
+        <span class="chip"><img width="18" height="18" loading="lazy" src="assets/icons/supabase-original.svg" alt="">Supabase</span>
+        <span class="chip"><img width="18" height="18" loading="lazy" src="assets/icons/postgresql-original.svg" alt="">PostgreSQL</span>
+        <span class="chip"><span class="ai-ico">⇄</span>REST APIs</span>
+      </div>
+    </div>
+
+    <div class="stack-group">
+      <div class="stack-label">CMS</div>
+      <div class="chips">
+        <span class="chip"><img class="invert-dark" width="18" height="18" loading="lazy" src="assets/icons/wordpress-plain.svg" alt="">WordPress</span>
+        <span class="chip"><img width="18" height="18" loading="lazy" src="assets/icons/webflow-original.svg" alt="">Webflow</span>
+      </div>
+    </div>
+
+    <div class="stack-group">
+      <div class="stack-label">AI Engineering</div>
+      <div class="chips">
+        <span class="chip"><span class="ai-ico">✦</span>LLM Integration</span>
+        <span class="chip"><span class="ai-ico">⌘</span>AI Orchestration</span>
+        <span class="chip"><span class="ai-ico">⚙</span>AI Workflows &amp; Agents</span>
+      </div>
+    </div>
+
+    <div class="stack-group">
+      <div class="stack-label">Tools &amp; Cloud</div>
+      <div class="chips">
+        <span class="chip"><img width="18" height="18" loading="lazy" src="assets/icons/git-original.svg" alt="">Git</span>
+        <span class="chip"><img class="invert-dark" width="18" height="18" loading="lazy" src="assets/icons/github-original.svg" alt="">GitHub</span>
+        <span class="chip"><img class="invert-dark" width="18" height="18" loading="lazy" src="assets/icons/vercel-original.svg" alt="">Vercel</span>
+        <span class="chip"><img width="18" height="18" loading="lazy" src="assets/icons/vscode-original.svg" alt="">VS Code</span>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ================= EXPERIENCE ================= -->
+  <section id="experience" class="reveal">
+    <h2>Experience</h2>
+
+    <div class="exp">
+      <a class="exp-logo" href="https://weam.ai" target="_blank" rel="noopener" aria-label="Weam.ai website" style="background:#fff;border-color:var(--border);padding:4px"><img src="assets/weam-logo.webp" width="128" height="37" loading="lazy" alt="Weam.ai logo" style="max-width:100%;max-height:100%;width:auto;height:auto" /></a>
+      <div class="exp-body">
+        <div class="exp-top">
+          <div>
+            <a class="exp-company exp-link" href="https://weam.ai" target="_blank" rel="noopener">Weam.ai <span class="ext">↗</span></a>
+            <div class="exp-role">AI Associate</div>
+          </div>
+          <span class="badge current">Jul 2026 – Present</span>
+        </div>
+        <ul>
+          <li>Help franchise and multi-unit brands bring AI into day-to-day operations.</li>
+          <li>Design AI-powered workflows across marketing, local operations, reporting and customer support.</li>
+        </ul>
+        <div class="tags"><span class="tag">AI Solutions</span><span class="tag">Automation</span><span class="tag">Workflow Design</span><span class="tag">Franchise Ops</span></div>
+      </div>
+    </div>
+
+    <div class="exp">
+      <a class="exp-logo" href="https://x.com/coinveda14" target="_blank" rel="noopener" aria-label="CoinVeda on X" style="background:#000;border-color:var(--border);padding:4px"><img src="assets/coinveda-logo.webp" width="112" height="88" loading="lazy" alt="CoinVeda logo" style="max-width:100%;max-height:100%;width:auto;height:auto" /></a>
+      <div class="exp-body">
+        <div class="exp-top">
+          <div>
+            <a class="exp-company exp-link" href="https://x.com/coinveda14" target="_blank" rel="noopener">CoinVeda <span class="ext">↗</span></a>
+            <div class="exp-role">AI Orchestrator · Dubai, UAE (Remote)</div>
+          </div>
+          <span class="badge">Feb 2026 – May 2026</span>
+        </div>
+        <ul>
+          <li>Led AI-driven growth and content operations using prompt engineering, GenAI video and AI workflows.</li>
+          <li>Supported business development with AI-assisted outreach, lead management and pipeline tracking.</li>
+          <li>Turned ideas into scalable workflows across content, operations and BD.</li>
+        </ul>
+        <div class="tags"><span class="tag">Prompt Engineering</span><span class="tag">GenAI</span><span class="tag">Growth</span><span class="tag">Business Development</span></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ================= PROJECTS ================= -->
+  <section id="projects" class="reveal">
+    <h2>Shipped Previously <span class="h2-note">(new ones adding soon)</span></h2>
+    <div class="projects">
+      <a class="project" href="https://chatter-sphere-o8nmsu4wi-harsh-s-projects-69c444cb.vercel.app/" target="_blank" rel="noopener">
+        <div class="project-top"><h3>AI PDF Chatbot</h3><span class="arrow">↗</span></div>
+        <p>A document assistant that answers questions from uploaded PDFs, using semantic search, retrieval and prompt engineering for grounded answers.</p>
+        <div class="tags" style="margin-top:0"><span class="tag">Python</span><span class="tag">LLM</span><span class="tag">RAG</span></div>
+      </a>
+      <a class="project" href="https://nft-ai-powered-price-predictions.vercel.app/" target="_blank" rel="noopener">
+        <div class="project-top"><h3>NFT Price Prediction</h3><span class="arrow">↗</span></div>
+        <p>An AI-powered NFT analytics platform that turns live marketplace data into predictions, trend dashboards and asset monitoring.</p>
+        <div class="tags" style="margin-top:0"><span class="tag">Next.js</span><span class="tag">AI Analytics</span><span class="tag">APIs</span></div>
+      </a>
+      <a class="project wide" href="https://github.com/harshkaptan/spendly" target="_blank" rel="noopener">
+        <div class="project-top"><h3>Spendly — AI Expense Tracker</h3><span class="arrow">↗</span></div>
+        <p>A full-stack expense management platform with budgeting, spending insights and analytics that help users track and optimise their habits.</p>
+        <div class="tags" style="margin-top:0"><span class="tag">React</span><span class="tag">Next.js</span><span class="tag">REST APIs</span></div>
+      </a>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ================= ACHIEVEMENTS ================= -->
+  <section id="achievements" class="reveal">
+    <h2>Achievements</h2>
+
+    <div class="ach">
+      <div class="ach-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 22h16M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg></div>
+      <div class="ach-body">
+        <div class="ach-top"><div><div class="ach-title">Finalist</div><div class="ach-sub">Vadodara Hackathon 6.0</div></div><span class="badge">Top 48 / 350+ teams</span></div>
+        <div class="ach-desc">Made the finals out of 350+ participating teams with an AI-driven solution built under hackathon pressure.</div>
+      </div>
+    </div>
+
+    <div class="ach">
+      <div class="ach-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23Z"/></svg></div>
+      <div class="ach-body">
+        <div class="ach-top"><div><div class="ach-title">ReWear — Community Clothing Exchange</div><div class="ach-sub">Odoo Hackathon 2025</div></div><span class="badge">Participant</span></div>
+        <div class="ach-desc">Built a community platform for exchanging and reusing clothing to cut textile waste.</div>
+      </div>
+    </div>
+
+    <div class="ach">
+      <div class="ach-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.8H20l-4.9 3.6 1.9 5.8-5-3.6-5 3.6 1.9-5.8L4 8.8h6.1z"/></svg></div>
+      <div class="ach-body">
+        <div class="ach-top"><div><div class="ach-title">Gemini Certified Student</div><div class="ach-sub">Google for Education</div></div><span class="badge">Certified</span></div>
+        <div class="ach-desc">Certified by Google in using Gemini for learning, research and productivity.</div>
+      </div>
+    </div>
+
+    <div class="ach">
+      <div class="ach-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a7 7 0 0 0-4 12.74V17h8v-2.26A7 7 0 0 0 12 2ZM9 21h6"/></svg></div>
+      <div class="ach-body">
+        <div class="ach-top"><div><div class="ach-title">Generative AI Builder</div><div class="ach-sub">Workshops, hackathons &amp; product events</div></div><span class="badge">Ongoing</span></div>
+        <div class="ach-desc">Regularly take part in Generative AI workshops, hackathons and AI product development events.</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ================= EDUCATION ================= -->
+  <section id="education" class="reveal">
+    <h2>Education</h2>
+    <div class="edu">
+      <a class="exp-logo" href="https://paruluniversity.ac.in" target="_blank" rel="noopener" aria-label="Parul University website" style="background:#fff;border-color:var(--border);padding:4px"><img src="assets/parul-mark.webp" width="112" height="61" loading="lazy" alt="Parul University logo" style="max-width:100%;max-height:100%;width:auto;height:auto" /></a>
+      <div class="exp-body">
+        <div class="exp-top">
+          <div>
+            <a class="exp-company exp-link" href="https://paruluniversity.ac.in" target="_blank" rel="noopener">Parul University <span class="ext">↗</span></a>
+            <div class="exp-role">B.Tech · Computer Science Engineering (Artificial Intelligence)</div>
+          </div>
+          <span class="badge">2022 – 2026</span>
+        </div>
+      </div>
+    </div>
+    <div class="edu">
+      <span class="exp-logo net-logo" aria-hidden="true" data-tip="www">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3Z"/></svg>
+      </span>
+      <div class="exp-body">
+        <div class="exp-top">
+          <div>
+            <div class="exp-company">Internet</div>
+            <div class="exp-role">Everything</div>
+          </div>
+          <span class="badge">∞</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ================= CONTACT CTA ================= -->
+  <section id="contact" class="reveal">
+    <div class="cta has-meme">
+      <figure class="meme" data-tip="Us after the 30-min call">
+        <img src="assets/handshake.webp" alt="Two friends about to do a hype handshake" width="640" height="500" loading="lazy" decoding="async" />
+        <figcaption class="mono">us after a 30-min call 🤝</figcaption>
+      </figure>
+      <div class="cta-text">
+      <span class="avail">Available for new projects</span>
+      <h3>Let's build something together</h3>
+      <p>Pick a slot that works for you :)</p>
+      <div class="cta-row">
+        <button class="btn primary book-call">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 8-6 4 6 4V8Z"/><rect x="2" y="6" width="14" height="12" rx="2"/></svg>
+          Book a 30-min call
+        </button>
+        <a class="btn" href="mailto:harshkaptan@gmail.com">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>
+          Email me
+        </a>
+      </div>
+      <div class="email-line">or write to <a href="mailto:harshkaptan@gmail.com">harshkaptan@gmail.com</a></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <footer>
+    <div class="foot-text mono">
+      <span>Running on caffeine and questionable decisions! 😮‍💨</span>
+    </div>
+    <div class="cat" id="cat" role="button" tabindex="0" aria-label="zzz, a sleeping pixel cat. Click to wake it" data-tip="Shh… it's sleeping">
+      <div class="zz" aria-hidden="true"><span>z</span><span>z</span><span>z</span></div>
+      <svg id="cat-svg" viewBox="0 0 22 14" shape-rendering="crispEdges" aria-hidden="true"></svg>
+    </div>
+  </footer>
+  <div class="foot-dots"></div>
+</main>
+</div>
+
+<!-- ================= FLOATING DOCK ================= -->
+<div class="dock" aria-label="Social links">
+  <a href="mailto:harshkaptan@gmail.com" data-tip="Email" aria-label="Email"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg></a>
+  <a href="https://www.linkedin.com/in/harsh-kaptan-ab0a1a253" target="_blank" rel="noopener" data-tip="LinkedIn" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28ZM5.34 7.43a2.06 2.06 0 1 1 0-4.13 2.06 2.06 0 0 1 0 4.13ZM7.12 20.45H3.56V9h3.56v11.45ZM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0Z"/></svg></a>
+  <a href="https://x.com/harshkaptan" target="_blank" rel="noopener" data-tip="X" aria-label="X"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.9 2H22l-7.6 8.7L23.3 22h-7l-5.5-7.2L4.5 22H1.4l8.1-9.3L1 2h7.2l5 6.6L18.9 2Zm-1.2 18h1.7L7.4 3.9H5.6L17.7 20Z"/></svg></a>
+  <a href="https://github.com/harshkaptan" target="_blank" rel="noopener" data-tip="GitHub" aria-label="GitHub"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .3a12 12 0 0 0-3.8 23.38c.6.12.83-.26.83-.57L9 21.07c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.08-.74.09-.73.09-.73 1.2.09 1.83 1.24 1.83 1.24 1.07 1.83 2.81 1.3 3.5 1 .1-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.64 1.66.24 2.88.12 3.18a4.65 4.65 0 0 1 1.23 3.22c0 4.61-2.8 5.63-5.48 5.92.42.36.81 1.1.81 2.22l-.01 3.29c0 .31.2.69.82.57A12 12 0 0 0 12 .3Z"/></svg></a>
+  <a href="https://www.instagram.com/harsh_kaptan_06" target="_blank" rel="noopener" data-tip="Instagram" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".6" fill="currentColor"/></svg></a>
+  <a href="https://in.pinterest.com/harshkaptan/" target="_blank" rel="noopener" data-tip="Pinterest" aria-label="Pinterest"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0a12 12 0 0 0-4.37 23.17c-.1-.95-.2-2.4.04-3.44l1.4-5.96s-.35-.71-.35-1.77c0-1.66.96-2.9 2.16-2.9 1.02 0 1.51.77 1.51 1.68 0 1.03-.65 2.56-.99 3.98-.28 1.19.6 2.16 1.77 2.16 2.13 0 3.76-2.24 3.76-5.48 0-2.87-2.06-4.87-5-4.87-3.41 0-5.41 2.56-5.41 5.2 0 1.03.4 2.14.89 2.74.1.12.11.22.08.34l-.33 1.36c-.05.22-.18.27-.4.16-1.5-.7-2.43-2.88-2.43-4.64 0-3.78 2.75-7.25 7.92-7.25 4.16 0 7.39 2.96 7.39 6.92 0 4.13-2.6 7.45-6.21 7.45-1.21 0-2.35-.63-2.74-1.37l-.75 2.85c-.27 1.04-1 2.35-1.49 3.15A12 12 0 1 0 12 0Z"/></svg></a>
+  <a href="https://open.spotify.com/user/31jpagslf3q52ahn73ktglerunxm" target="_blank" rel="noopener" data-tip="Spotify" aria-label="Spotify"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0a12 12 0 1 0 0 24 12 12 0 0 0 0-24Zm5.5 17.3a.75.75 0 0 1-1.03.25c-2.82-1.72-6.37-2.11-10.55-1.16a.75.75 0 1 1-.33-1.46c4.57-1.04 8.5-.6 11.66 1.34.36.22.47.68.25 1.03Zm1.47-3.27a.94.94 0 0 1-1.29.31c-3.23-1.98-8.15-2.56-11.97-1.4a.94.94 0 1 1-.54-1.8c4.36-1.32 9.78-.68 13.49 1.6.44.27.58.85.31 1.29Zm.13-3.4C15.23 8.33 8.86 8.12 5.17 9.24a1.13 1.13 0 1 1-.65-2.16c4.23-1.28 11.27-1.03 15.72 1.61a1.13 1.13 0 0 1-1.15 1.94Z"/></svg></a>
+  <span class="sep"></span>
+  <button class="book-call" data-tip="Book a call" aria-label="Book a call"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></button>
+  <button class="theme-toggle" data-tip="Theme" aria-label="Toggle theme">
+    <svg class="theme-icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+    <svg class="theme-icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+  </button>
+</div>
+
+<!-- ================= BOOKING MODAL ================= -->
+<div class="cmdk" id="cmdk" role="dialog" aria-modal="true" aria-label="Command palette" hidden>
+  <div class="cmdk-box">
+    <div class="cmdk-input">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="cmdk-q" type="text" placeholder="Type a command or search…" autocomplete="off" spellcheck="false" aria-label="Search commands" aria-controls="cmdk-list" />
+      <button class="cmdk-x" id="cmdk-close" aria-label="Close command palette"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    </div>
+    <div class="cmdk-list" id="cmdk-list" role="listbox"></div>
+    <div class="cmdk-foot">
+      <span class="logo">HK<span style="color:var(--accent)">.</span></span>
+      <span class="cmdk-hints"><span>Go to Page</span><kbd class="kbd">↵</kbd><i></i><span>Exit</span><kbd class="kbd">Esc</kbd></span>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="booking-modal" role="dialog" aria-modal="true" aria-label="Book a 30-minute call">
+  <div class="modal-box">
+    <div class="modal-head">
+      <span>Book a 30-min call · Google Meet</span>
+      <button class="icon-btn" id="close-modal" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    </div>
+    <iframe id="booking-frame" title="Book a call"></iframe>
+  </div>
+</div>
+
+<script src="assets/common.js" defer></script>
+<script src="assets/home.js" defer></script>
+</body>
+</html>
