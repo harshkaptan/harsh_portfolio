@@ -130,8 +130,8 @@ nav.top .inner {
   border-bottom: 1px solid var(--edge);
   background: var(--surface);
 }
-.banner img { display: block; width: 100%; height: 100%; }
-.banner img { object-fit: cover; object-position: center; }
+.banner img, .banner video { display: block; width: 100%; height: 100%; }
+.banner img, .banner video { object-fit: cover; object-position: center; }
 .hero { padding-top: 0; }
 .hero-row { display: flex; gap: 22px; align-items: flex-end; margin-top: -58px; position: relative; z-index: 2; }
 .hero-row > .hero-meta, .hero-row > .hero-socials { margin-top: 70px; }
@@ -477,9 +477,9 @@ body.cmdk-lock { overflow: hidden; }
   .search-btn svg { margin-right: 0; }
   .cmdk { padding-top: 8vh; }
   .cmdk-hints span:first-child, .cmdk-hints kbd:first-of-type, .cmdk-hints i { display: none; }
-  .hero-row { flex-direction: column; align-items: flex-start; gap: 12px; margin-top: -50px; }
+  .hero-row { flex-direction: column; align-items: flex-start; gap: 12px; margin-top: -28px; }
   .hero-row > .hero-meta, .hero-row > .hero-socials { margin-top: 0; }
-  .avatar { width: 100px; height: 100px; }
+  .avatar { width: 88px; height: 88px; border-radius: 18px; }
   .name { font-size: 26px; }
   .about-grid, .projects, .field-row { grid-template-columns: 1fr; }
   .project.wide { grid-column: auto; }

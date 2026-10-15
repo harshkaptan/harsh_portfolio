@@ -11,8 +11,8 @@
 <link rel="icon" type="image/png" href="/assets/favicon.png" />
 <link rel="preload" href="/assets/fonts/Geist-Variable.woff2" as="font" type="font/woff2" crossorigin />
 <link rel="preload" href="/assets/fonts/GeistPixel-Grid.woff2" as="font" type="font/woff2" crossorigin />
-<link rel="preload" as="image" type="image/webp" href="/assets/banner-800.webp" imagesrcset="/assets/banner-800.webp 800w, /assets/banner-1600.webp 1600w" imagesizes="(max-width: 760px) 100vw, 758px" fetchpriority="high" />
-<link rel="stylesheet" href="/assets/style.css?v=8879eb21" />
+<link rel="preload" as="image" type="image/webp" href="/assets/banner-poster.webp" fetchpriority="high" />
+<link rel="stylesheet" href="/assets/style.css?v=4bcf58e8" />
 <script>
   // Apply the saved theme before paint so there is no flash. Dark is the default.
   (function () {
@@ -50,7 +50,12 @@
 
   <!-- ================= HERO ================= -->
   <div class="banner">
-    <img src="/assets/banner-800.webp" srcset="/assets/banner-800.webp 800w, /assets/banner-1600.webp 1600w" sizes="(max-width: 760px) 100vw, 758px" alt="Humans are busy, machines are learning." width="1600" height="595" fetchpriority="high" />
+    <video class="banner-video" autoplay muted loop playsinline preload="auto" disablepictureinpicture
+      poster="/assets/banner-poster.webp" width="1280" height="476" aria-label="Animated banner: Humans are busy, machines are learning.">
+      <source src="/assets/banner-800.mp4" type="video/mp4" media="(max-width: 760px)" />
+      <source src="/assets/banner.webm" type="video/webm" />
+      <source src="/assets/banner.mp4" type="video/mp4" />
+    </video>
     <span class="cross l"></span><span class="cross r"></span>
   </div>
   <section class="hero">
@@ -491,6 +496,6 @@
 </div>
 
 <script src="/assets/common.js?v=d704b130" defer></script>
-<script src="/assets/home.js?v=944d3ec5" defer></script>
+<script src="/assets/home.js?v=38d5a194" defer></script>
 </body>
 </html>

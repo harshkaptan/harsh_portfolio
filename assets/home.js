@@ -216,3 +216,14 @@ function toggleMusic() {
   if (location.pathname !== start || location.hash) history.replaceState({}, '', start);
   if (start !== '/') render(start, false);
 })();
+
+/* ---------- Banner video ----------
+   Plays muted on loop. Paused when scrolled out of view (saves battery)
+   and for visitors who prefer reduced motion (the poster frame shows). */
+(function () {
+  const v = document.querySelector('.banner-video');
+  if (!v) return;
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { v.removeAttribute('autoplay'); v.pause(); return; }
+  const play = () => { const p = v.play(); if (p) p.catch(() => {}); };
+  new IntersectionObserver(([e]) => (e.isIntersecting ? play() : v.pause())).observe(v);
+})();
