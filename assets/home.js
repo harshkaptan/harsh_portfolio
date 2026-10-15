@@ -156,3 +156,78 @@ function toggleMusic() {
     else { term.classList.remove('is-max'); term.classList.toggle('is-min'); }
   });
 })();
+
+/* ---------- Favourites without a page reload ----------
+   A normal link to favourites.html would reload the page and cut the music.
+   On the home page we load Favourites in place instead: fetch it, show its
+   content, and hide (not remove) the home content so the Spotify player
+   keeps playing. The address bar and back button still behave normally. */
+(function () {
+  const homeMain = document.querySelector('main#home');
+  if (!homeMain) return;
+  const live = !['localhost', '127.0.0.1', ''].includes(location.hostname);
+  const FAV_URL = live ? '/favourites' : 'favourites.html';
+  const HOME_URL = live ? '/' : 'index.html';
+  const homeTitle = document.title;
+  const favLink = document.querySelector('.nav-links a[href$="favourites.html"]');
+  let favMain = null, favTitle = 'Favourites · Harsh Kaptan', homeScroll = 0, loading = null;
+
+  const favShown = () => !!favMain && document.contains(favMain);
+  const isFavPath = p => /\/favourites(\.html)?$/.test(p);
+  const isHomePath = p => /\/(index\.html)?$/.test(p);
+
+  async function load() {
+    if (favMain) return;
+    if (!loading) loading = fetch('favourites.html').then(r => r.text()).then(html => {
+      const doc = new DOMParser().parseFromString(html, 'text/html');
+      favMain = document.importNode(doc.querySelector('main'), true);
+      favMain.id = 'fav-view';
+      favTitle = doc.title;
+    });
+    await loading;
+  }
+
+  async function showFav(push = true) {
+    try { await load(); } catch (e) { location.href = 'favourites.html'; return; }
+    if (!favShown()) {
+      homeScroll = scrollY;
+      homeMain.style.display = 'none';
+      homeMain.after(favMain);
+    }
+    document.title = favTitle;
+    if (favLink) favLink.classList.add('active');
+    if (push) history.pushState({ view: 'fav' }, '', FAV_URL);
+    scrollTo(0, 0);
+  }
+
+  function showHome(hash = '', push = true) {
+    if (favShown()) favMain.remove();
+    homeMain.style.display = '';
+    document.title = homeTitle;
+    if (favLink) favLink.classList.remove('active');
+    if (push) history.pushState({ view: 'home' }, '', HOME_URL + hash);
+    const target = hash && document.getElementById(hash.slice(1));
+    if (target) target.scrollIntoView(); else scrollTo(0, hash ? 0 : homeScroll);
+  }
+
+  window.__showFav = () => showFav(true);
+  window.__showHome = hash => showHome(hash, true);
+
+  document.addEventListener('click', e => {
+    const a = e.target.closest('a[href]');
+    if (!a || a.target === '_blank' || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+    const raw = a.getAttribute('href');
+    if (raw.startsWith('#') && favShown()) { e.preventDefault(); showHome(raw, true); return; }
+    const url = new URL(a.href, location.href);
+    if (url.origin !== location.origin) return;
+    if (isFavPath(url.pathname)) { e.preventDefault(); showFav(true); }
+    else if (favShown() && isHomePath(url.pathname)) { e.preventDefault(); showHome(url.hash, true); }
+  });
+
+  addEventListener('popstate', () => {
+    if (isFavPath(location.pathname)) showFav(false); else showHome(location.hash, false);
+  });
+
+  // warm the cache so the switch feels instant
+  if (favLink) favLink.addEventListener('pointerenter', () => load().catch(() => {}), { once: true });
+})();

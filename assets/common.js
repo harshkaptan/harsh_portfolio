@@ -158,8 +158,17 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal()
   };
 
   const onHome = !!document.getElementById('about');
-  const go = id => () => { const el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: 'smooth' }); else location.href = 'index.html#' + id; };
-  const top = () => onHome ? scrollTo({ top: 0, behavior: 'smooth' }) : (location.href = 'index.html');
+  // on the home page, Favourites opens in-page (see home.js) so we route back through it
+  const inFav = () => !!document.getElementById('fav-view');
+  const go = id => () => {
+    if (inFav() && window.__showHome) return window.__showHome('#' + id);
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth' }); else location.href = 'index.html#' + id;
+  };
+  const top = () => {
+    if (inFav() && window.__showHome) return window.__showHome('');
+    onHome ? scrollTo({ top: 0, behavior: 'smooth' }) : (location.href = 'index.html');
+  };
   const open = url => () => window.open(url, '_blank', 'noopener');
   const prompt = () => `Summarize Harsh Kaptan's portfolio at ${location.origin + location.pathname}: work, skills, projects and experience.`;
   const kbd = keys => keys.map(k => `<kbd class="kbd">${k}</kbd>`).join('');
@@ -180,7 +189,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal()
       { label: 'Achievements', icon: I.trophy, run: go('achievements'), kw: 'hackathon' },
       { label: 'Education', icon: I.cap, run: go('education'), kw: 'parul university' },
       { label: 'Contact', icon: I.mail, run: go('contact') },
-      { label: 'Favourites', icon: I.film, run: () => { location.href = 'favourites.html'; }, kw: 'movies series anime spider-man suits breaking bad one piece' },
+      { label: 'Favourites', icon: I.film, run: () => { window.__showFav ? window.__showFav() : (location.href = 'favourites.html'); }, kw: 'movies series anime spider-man suits breaking bad one piece' },
     ]},
     { name: 'Connect', items: [
       { label: 'Book a 30-min call', icon: I.cal, run: () => { const b = document.querySelector('.book-call'); b ? b.click() : window.open(CALENDAR_URL, '_blank', 'noopener'); }, kw: 'meet calendar cal' },
