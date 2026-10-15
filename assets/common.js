@@ -136,7 +136,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal()
   if (!isMac) openBtn.setAttribute('data-tip', 'Search (Ctrl K)');
 
   const svg = d => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
-  const brand = file => `<span class="brand" style="--m:url('${new URL('assets/icons/' + file, location.href).href}')"></span>`;
+  const brand = file => `<span class="brand" style="--m:url('${new URL('/assets/icons/' + file, location.href).href}')"></span>`;
   const I = {
     home: svg('<path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>'),
     user: svg('<circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/>'),
@@ -158,17 +158,9 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal()
   };
 
   const onHome = !!document.getElementById('about');
-  // on the home page, Favourites opens in-page (see home.js) so we route back through it
-  const inFav = () => !!document.getElementById('fav-view');
-  const go = id => () => {
-    if (inFav() && window.__showHome) return window.__showHome('#' + id);
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: 'smooth' }); else location.href = 'index.html#' + id;
-  };
-  const top = () => {
-    if (inFav() && window.__showHome) return window.__showHome('');
-    onHome ? scrollTo({ top: 0, behavior: 'smooth' }) : (location.href = 'index.html');
-  };
+  // the router (home.js) handles clean URLs without reloading the page
+  const go = id => () => window.__navigateToId ? window.__navigateToId(id) : document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+  const top = () => window.__navigate ? window.__navigate('/') : scrollTo({ top: 0, behavior: 'smooth' });
   const open = url => () => window.open(url, '_blank', 'noopener');
   const prompt = () => `Summarize Harsh Kaptan's portfolio at ${location.origin + location.pathname}: work, skills, projects and experience.`;
   const kbd = keys => keys.map(k => `<kbd class="kbd">${k}</kbd>`).join('');
@@ -178,7 +170,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal()
       { label: 'Open in ChatGPT', icon: brand('openai.svg'), run: () => open('https://chatgpt.com/?q=' + encodeURIComponent(prompt()))() },
       { label: 'Open in Claude', icon: brand('claude.svg'), run: () => open('https://claude.ai/new?q=' + encodeURIComponent(prompt()))() },
       { label: 'Open in Perplexity', icon: brand('perplexity.svg'), run: () => open('https://www.perplexity.ai/search?q=' + encodeURIComponent(prompt()))() },
-      { label: 'Open in Markdown', icon: I.file, run: open('harsh-kaptan.md') },
+      { label: 'Open in Markdown', icon: I.file, run: open('/harsh-kaptan.md') },
     ]},
     { name: 'Navigation', items: [
       { label: 'Home', icon: I.home, run: top },
@@ -189,7 +181,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal()
       { label: 'Achievements', icon: I.trophy, run: go('achievements'), kw: 'hackathon' },
       { label: 'Education', icon: I.cap, run: go('education'), kw: 'parul university' },
       { label: 'Contact', icon: I.mail, run: go('contact') },
-      { label: 'Favourites', icon: I.film, run: () => { window.__showFav ? window.__showFav() : (location.href = 'favourites.html'); }, kw: 'movies series anime spider-man suits breaking bad one piece' },
+      { label: 'Favourites', icon: I.film, run: () => window.__navigate ? window.__navigate('/favourites') : (location.href = '/favourites'), kw: 'movies series anime spider-man suits breaking bad one piece' },
     ]},
     { name: 'Connect', items: [
       { label: 'Book a 30-min call', icon: I.cal, run: () => { const b = document.querySelector('.book-call'); b ? b.click() : window.open(CALENDAR_URL, '_blank', 'noopener'); }, kw: 'meet calendar cal' },
@@ -203,7 +195,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal()
       { label: 'Toggle theme', icon: I.sun, keys: ['D'], run: () => document.querySelector('.theme-toggle').click(), kw: 'dark light mode' },
       ...(onHome ? [
         { label: 'Play / pause music', icon: I.music, keys: ['M'], run: () => toggleMusic(), kw: 'spotify blinding lights' },
-        { label: 'Wake the cat', icon: I.cat, run: () => { go('cat')(); setTimeout(() => document.getElementById('cat').click(), 600); } },
+        { label: 'Wake the cat', icon: I.cat, run: () => { top(); setTimeout(() => { const c = document.getElementById('cat'); c.scrollIntoView({ behavior: 'smooth', block: 'center' }); setTimeout(() => c.click(), 600); }, 50); } },
       ] : []),
       { label: 'Scroll to top', icon: I.up, keys: ['Shift', '↑'], run: () => scrollTo({ top: 0, behavior: 'smooth' }) },
       { label: 'Close command palette', icon: I.search, run: () => {} },

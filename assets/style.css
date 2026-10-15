@@ -572,3 +572,11 @@ h2 { flex-wrap: wrap; row-gap: 4px; }
 }
 :root[data-theme="light"] .tip.mac { background: rgba(236,236,240,.88); color: #1c1c1e; border-color: rgba(0,0,0,.1); }
 :root[data-theme="light"] .tip.mac::after { border-color: rgba(0,0,0,.1); }
+
+/* ---------- Router views ---------- */
+/* Home is moved off-screen (not display:none) while Favourites shows,
+   so the Spotify iframe inside it keeps playing. */
+.view-off {
+  position: absolute !important; left: 0; top: 0; width: 1px !important; height: 1px !important;
+  overflow: hidden !important; clip-path: inset(50%); pointer-events: none; opacity: 0;
+}

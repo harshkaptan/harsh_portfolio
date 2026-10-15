@@ -157,77 +157,62 @@ function toggleMusic() {
   });
 })();
 
-/* ---------- Favourites without a page reload ----------
-   A normal link to favourites.html would reload the page and cut the music.
-   On the home page we load Favourites in place instead: fetch it, show its
-   content, and hide (not remove) the home content so the Spotify player
-   keeps playing. The address bar and back button still behave normally. */
+/* ---------- Router: one page, clean URLs ----------
+   Everything (home sections + Favourites) lives in this one page, so the
+   browser never reloads and the Spotify player never restarts.
+   Addresses look like /about, /work, /favourites (no .html, no #). */
 (function () {
-  const homeMain = document.querySelector('main#home');
-  if (!homeMain) return;
-  const live = !['localhost', '127.0.0.1', ''].includes(location.hostname);
-  const FAV_URL = live ? '/favourites' : 'favourites.html';
-  const HOME_URL = live ? '/' : 'index.html';
-  const homeTitle = document.title;
-  const favLink = document.querySelector('.nav-links a[href$="favourites.html"]');
-  let favMain = null, favTitle = 'Favourites · Harsh Kaptan', homeScroll = 0, loading = null;
+  const homeMain = document.getElementById('home');
+  const favMain = document.getElementById('fav-view');
+  if (!homeMain || !favMain) return;
+  const ROUTES = {
+    '/': null, '/about': 'about', '/stack': 'stack', '/work': 'experience', '/projects': 'projects',
+    '/achievements': 'achievements', '/education': 'education', '/contact': 'contact', '/favourites': 'FAV',
+  };
+  const ID_TO_PATH = Object.fromEntries(Object.entries(ROUTES).filter(([, id]) => id && id !== 'FAV').map(([p, id]) => [id, p]));
+  const TITLES = { home: 'Harsh Kaptan', fav: 'Favourites · Harsh Kaptan' };
+  const norm = p => { p = p.replace(/\/index(\.html)?$/, '/').replace(/\.html$/, '').replace(/(.)\/$/, '$1'); return p in ROUTES ? p : null; };
 
-  const favShown = () => !!favMain && document.contains(favMain);
-  const isFavPath = p => /\/favourites(\.html)?$/.test(p);
-  const isHomePath = p => /\/(index\.html)?$/.test(p);
-
-  async function load() {
-    if (favMain) return;
-    if (!loading) loading = fetch('favourites.html').then(r => r.text()).then(html => {
-      const doc = new DOMParser().parseFromString(html, 'text/html');
-      favMain = document.importNode(doc.querySelector('main'), true);
-      favMain.id = 'fav-view';
-      favTitle = doc.title;
-    });
-    await loading;
+  function render(path, smooth) {
+    const target = ROUTES[path];
+    const fav = target === 'FAV';
+    // hide home off-screen (not display:none) so the music iframe keeps playing
+    homeMain.classList.toggle('view-off', fav);
+    favMain.hidden = !fav;
+    document.title = fav ? TITLES.fav : TITLES.home;
+    document.querySelectorAll('.nav-links a[data-route]').forEach(a => a.classList.toggle('active', a.getAttribute('href') === path && path !== '/'));
+    if (fav) { scrollTo(0, 0); return; }
+    const el = target && document.getElementById(target);
+    if (el) {
+      el.classList.add('in'); // make sure scroll-reveal sections are visible
+      requestAnimationFrame(() => el.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto' }));
+    } else scrollTo({ top: 0, behavior: smooth ? 'smooth' : 'auto' });
   }
 
-  async function showFav(push = true) {
-    try { await load(); } catch (e) { location.href = 'favourites.html'; return; }
-    if (!favShown()) {
-      homeScroll = scrollY;
-      homeMain.style.display = 'none';
-      homeMain.after(favMain);
-    }
-    document.title = favTitle;
-    if (favLink) favLink.classList.add('active');
-    if (push) history.pushState({ view: 'fav' }, '', FAV_URL);
-    scrollTo(0, 0);
+  function navigate(path, smooth = true) {
+    path = norm(path) || '/';
+    if (location.pathname !== path) history.pushState({}, '', path);
+    render(path, smooth);
   }
-
-  function showHome(hash = '', push = true) {
-    if (favShown()) favMain.remove();
-    homeMain.style.display = '';
-    document.title = homeTitle;
-    if (favLink) favLink.classList.remove('active');
-    if (push) history.pushState({ view: 'home' }, '', HOME_URL + hash);
-    const target = hash && document.getElementById(hash.slice(1));
-    if (target) target.scrollIntoView(); else scrollTo(0, hash ? 0 : homeScroll);
-  }
-
-  window.__showFav = () => showFav(true);
-  window.__showHome = hash => showHome(hash, true);
+  window.__navigate = navigate;
+  window.__navigateToId = id => navigate(ID_TO_PATH[id] || '/');
 
   document.addEventListener('click', e => {
     const a = e.target.closest('a[href]');
-    if (!a || a.target === '_blank' || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
-    const raw = a.getAttribute('href');
-    if (raw.startsWith('#') && favShown()) { e.preventDefault(); showHome(raw, true); return; }
+    if (!a || a.target === '_blank' || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
     const url = new URL(a.href, location.href);
     if (url.origin !== location.origin) return;
-    if (isFavPath(url.pathname)) { e.preventDefault(); showFav(true); }
-    else if (favShown() && isHomePath(url.pathname)) { e.preventDefault(); showHome(url.hash, true); }
+    const path = norm(url.pathname);
+    if (path === null) return;
+    e.preventDefault();
+    navigate(path);
   });
+  addEventListener('popstate', () => render(norm(location.pathname) || '/', false));
 
-  addEventListener('popstate', () => {
-    if (isFavPath(location.pathname)) showFav(false); else showHome(location.hash, false);
-  });
-
-  // warm the cache so the switch feels instant
-  if (favLink) favLink.addEventListener('pointerenter', () => load().catch(() => {}), { once: true });
+  // first load: honour the URL (and tidy up old #hash / .html links)
+  let start = norm(location.pathname) || '/';
+  const legacy = location.hash && ID_TO_PATH[location.hash.slice(1)];
+  if (start === '/' && legacy) start = legacy;
+  if (location.pathname !== start || location.hash) history.replaceState({}, '', start);
+  if (start !== '/') render(start, false);
 })();

@@ -1,5 +1,12 @@
 {
   "cleanUrls": true,
+  "trailingSlash": false,
+  "rewrites": [
+    {
+      "source": "/(about|stack|work|projects|achievements|education|contact|favourites)",
+      "destination": "/index.html"
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",
@@ -39,7 +46,7 @@
       "headers": [
         {
           "key": "Cache-Control",
-          "value": "public, max-age=2592000"
+          "value": "public, max-age=0, must-revalidate"
         }
       ]
     },
@@ -54,6 +61,15 @@
     },
     {
       "source": "/assets/icons/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/assets/posters/(.*)",
       "headers": [
         {
           "key": "Cache-Control",
