@@ -3,8 +3,8 @@
   "trailingSlash": false,
   "rewrites": [
     {
-      "source": "/(about|stack|work|projects|achievements|education|contact|favourites)",
-      "destination": "/index.html"
+      "source": "/:page(about|stack|work|projects|achievements|education|contact|favourites)",
+      "destination": "/"
     }
   ],
   "headers": [
