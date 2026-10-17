@@ -224,21 +224,75 @@ nav.top .inner {
 }
 
 /* Spotify card */
+/* ---------- Dynamic Island now-playing ---------- */
 .music-card {
-  border: 1px solid var(--border); border-radius: 14px; background: var(--surface);
-  padding: 14px; display: flex; flex-direction: column; gap: 10px;
+  position: relative; isolation: isolate;
+  display: flex; align-items: center; justify-content: center; min-height: 232px;
 }
-.music-head { display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: var(--muted); }
-.music-head .live { display: inline-flex; align-items: center; gap: 6px; }
-.eq { display: inline-flex; gap: 2px; align-items: flex-end; height: 12px; }
-.eq b { width: 3px; background: var(--green); border-radius: 1px; height: 4px; }
-.playing .eq b { animation: eq .9s ease-in-out infinite; }
-.playing .eq b:nth-child(2) { animation-delay: .2s; }
-.playing .eq b:nth-child(3) { animation-delay: .4s; }
-@keyframes eq { 0%,100% { height: 3px; } 50% { height: 12px; } }
-#spotify-embed { border-radius: 12px; overflow: hidden; min-height: 152px; }
-#spotify-embed iframe { border-radius: 12px; }
-.music-hint { font-size: 12px; color: var(--faint); }
+/* the real Spotify player: on screen (so it keeps playing) but invisible */
+.isl-engine { position: absolute; inset: 0; z-index: -1; opacity: 0; pointer-events: none; overflow: hidden; border-radius: 14px; }
+.isl-engine iframe { width: 100%; height: 152px; border: 0; }
+
+.island {
+  --spring: cubic-bezier(.32, 1.45, .45, 1);
+  position: relative; width: 100%; max-width: 100%;
+  background: #000; color: #f5f5f7; border-radius: 34px;
+  padding: 12px 14px; cursor: default; user-select: none;
+  box-shadow: 0 0 0 1px rgba(255,255,255,.07), 0 18px 40px rgba(0,0,0,.35);
+  transition: max-width .55s var(--spring), border-radius .55s var(--spring), padding .55s var(--spring), transform .3s var(--spring);
+}
+:root[data-theme="light"] .island { box-shadow: 0 0 0 1px rgba(0,0,0,.06), 0 18px 40px rgba(0,0,0,.22); }
+.island.is-compact { max-width: 268px; border-radius: 999px; padding: 8px 14px 8px 8px; cursor: pointer; }
+.island.is-compact:hover { transform: scale(1.04); }
+.island.is-compact:active { transform: scale(.98); }
+
+.isl-top { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.isl-art {
+  width: 52px; height: 52px; border-radius: 14px; flex-shrink: 0; object-fit: cover;
+  transition: width .55s var(--spring), height .55s var(--spring), border-radius .55s var(--spring);
+}
+.island.is-compact .isl-art { width: 34px; height: 34px; border-radius: 50%; }
+.island.is-playing.is-compact .isl-art { animation: spin 8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.isl-meta { display: flex; flex-direction: column; min-width: 0; flex: 1; line-height: 1.25; }
+.isl-title { font-weight: 600; font-size: 15px; letter-spacing: -.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.isl-artist { font-size: 13px; color: rgba(245,245,247,.6); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.island.is-compact .isl-title { font-size: 13.5px; }
+.island.is-compact .isl-artist { font-size: 11.5px; }
+.isl-sp { width: 18px; height: 18px; color: #1ed760; flex-shrink: 0; align-self: flex-start; transition: opacity .3s; }
+.island.is-compact .isl-sp { display: none; }
+
+/* waveform, tinted like the album art */
+.isl-wave { display: flex; align-items: center; gap: 2.5px; height: 20px; flex-shrink: 0; }
+.isl-wave i { width: 3px; height: 4px; border-radius: 2px; background: linear-gradient(#ff8a5c, #e0473e); transition: height .3s; }
+.island.is-playing .isl-wave i { animation: wave 1s ease-in-out infinite; }
+.island.is-playing .isl-wave i:nth-child(2) { animation-delay: -.6s; animation-duration: .8s; }
+.island.is-playing .isl-wave i:nth-child(3) { animation-delay: -.3s; animation-duration: 1.15s; }
+.island.is-playing .isl-wave i:nth-child(4) { animation-delay: -.8s; animation-duration: .9s; }
+.island.is-playing .isl-wave i:nth-child(5) { animation-delay: -.45s; animation-duration: 1.05s; }
+@keyframes wave { 0%,100% { height: 4px; } 50% { height: 18px; } }
+
+/* expanding body (progress + controls) */
+.isl-body { display: grid; grid-template-rows: 1fr; transition: grid-template-rows .55s var(--spring), opacity .35s; }
+.isl-body-in { overflow: hidden; min-height: 0; }
+.island.is-compact .isl-body { grid-template-rows: 0fr; opacity: 0; }
+.isl-progress { display: flex; align-items: center; gap: 10px; margin-top: 16px; }
+.isl-time { font: 500 11.5px 'Geist Mono', monospace; color: rgba(245,245,247,.55); min-width: 38px; font-variant-numeric: tabular-nums; }
+.isl-time:last-child { text-align: right; }
+.isl-bar { flex: 1; height: 5px; border-radius: 3px; background: rgba(255,255,255,.18); overflow: hidden; cursor: pointer; }
+.isl-fill { height: 100%; width: 0; border-radius: 3px; background: #f5f5f7; }
+.isl-controls { display: flex; align-items: center; justify-content: center; gap: 26px; margin: 10px 0 2px; }
+.isl-btn { width: 36px; height: 36px; display: grid; place-items: center; border: 0; border-radius: 50%; background: none; color: #f5f5f7; cursor: pointer; transition: background .2s, transform .15s; }
+.isl-btn:hover { background: rgba(255,255,255,.1); }
+.isl-btn:active { transform: scale(.9); }
+.isl-btn svg { width: 22px; height: 22px; }
+.isl-play { width: 46px; height: 46px; }
+.isl-play svg { width: 28px; height: 28px; }
+.isl-play .i-pause, .island.is-playing .isl-play .i-play { display: none; }
+.island.is-playing .isl-play .i-pause { display: block; }
+.isl-hint { position: absolute; left: 0; right: 0; top: calc(100% + 10px); text-align: center; font-size: 12px; color: var(--faint); transition: opacity .3s; }
+.island:not(.is-compact) .isl-hint, .island.is-playing .isl-hint { opacity: 0; pointer-events: none; }
+@media (max-width: 640px) { .music-card { min-height: 0; padding: 6px 0 28px; } }
 
 /* ---------- Tech stack ---------- */
 .stack-group + .stack-group { margin-top: 18px; }

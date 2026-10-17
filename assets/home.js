@@ -88,18 +88,38 @@ const io = new IntersectionObserver(entries => entries.forEach(en => {
 }), { threshold: 0.12 });
 document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 
-/* ---------- Spotify: Blinding Lights ----------
-   Tries to start playing (from 0:07) the moment the page loads.
-   Browsers decide whether sound may play before the visitor interacts:
-   where they allow it, it just plays; where they block it, it starts on
-   the visitor's first click / tap / key press instead. */
+/* ---------- Spotify: Blinding Lights (Dynamic Island) ----------
+   The real Spotify player is loaded invisibly behind a Dynamic Island style
+   card; the island shows the artwork, waveform, progress and controls and
+   drives the player through Spotify's IFrame API.
+   It tries to start playing (from 0:07) the moment the page loads. Browsers
+   decide whether sound may play before the visitor interacts: where they
+   allow it, it just plays; otherwise the first click / tap / key starts it. */
 const card = document.getElementById('music-card');
-const statusEl = document.getElementById('music-status');
+const island = document.getElementById('island');
 const hint = document.getElementById('music-hint');
+const els = { cur: document.getElementById('isl-cur'), left: document.getElementById('isl-left'), fill: document.getElementById('isl-fill'), bar: island.querySelector('.isl-bar') };
 let spotify = null, started = false, wantPlay = true, apiRequested = false;
 const START_AT = 7;        // seconds: skip the intro on the first play
 let introSkipped = false;
 const EVENTS = ['pointerdown', 'pointerup', 'click', 'keydown', 'touchend'];
+const track = { pos: START_AT * 1000, dur: 200000, playing: false, at: performance.now() };
+
+const fmt = ms => { const t = Math.max(0, Math.round(ms / 1000)); return Math.floor(t / 60) + ':' + String(t % 60).padStart(2, '0'); };
+function paintProgress() {
+  const pos = Math.min(track.dur, track.pos + (track.playing ? performance.now() - track.at : 0));
+  els.cur.textContent = fmt(pos);
+  els.left.textContent = '-' + fmt(track.dur - pos);
+  els.fill.style.width = (track.dur ? (pos / track.dur) * 100 : 0) + '%';
+}
+(function tick() { if (track.playing) paintProgress(); requestAnimationFrame(tick); })();
+
+function setPlaying(playing) {
+  track.playing = playing;
+  island.classList.toggle('is-playing', playing);
+  island.classList.toggle('is-compact', !playing && !started);
+  island.querySelector('#isl-play').setAttribute('aria-label', playing ? 'Pause' : 'Play');
+}
 
 window.onSpotifyIframeApiReady = (IFrameAPI) => {
   IFrameAPI.createController(
@@ -108,7 +128,7 @@ window.onSpotifyIframeApiReady = (IFrameAPI) => {
     (controller) => {
       spotify = controller;
       const frame = card.querySelector('iframe');
-      if (frame) frame.title = 'Spotify player: Blinding Lights by The Weeknd';
+      if (frame) { frame.title = 'Spotify player: Blinding Lights by The Weeknd'; frame.tabIndex = -1; }
       controller.addListener('playback_update', e => {
         const playing = !e.data.isPaused;
         // first time the song plays, jump to 0:07 (only once, so replays/seeks are left alone)
@@ -116,13 +136,15 @@ window.onSpotifyIframeApiReady = (IFrameAPI) => {
           introSkipped = true;
           if (e.data.position < (START_AT - 1) * 1000) controller.seek(START_AT);
         }
-        card.classList.toggle('playing', playing);
-        statusEl.textContent = playing ? 'Now playing' : 'On repeat';
+        track.pos = e.data.position; track.at = performance.now();
+        if (e.data.duration) track.dur = e.data.duration;
         if (playing && !started) {
           started = true;
-          hint.textContent = 'Blinding Lights · The Weeknd';
+          if (hint) hint.textContent = '';
           EVENTS.forEach(t => removeEventListener(t, startMusic, true));
         }
+        setPlaying(playing);
+        paintProgress();
       });
       // autoplay: only try when this browser allows sound without a click.
       // (A blocked play() leaves Spotify's player stuck, so we check first
@@ -151,7 +173,7 @@ loadSpotify();
 // fallback: if the browser blocked autoplay, the first interaction starts it
 function startMusic(e) {
   if (started) return;
-  if (e && e.target.closest && e.target.closest('#spotify-embed')) return; // let the embed handle its own clicks
+  if (e && e.target.closest && e.target.closest('#island')) return;     // the island handles its own taps
   if (e && e.type === 'keydown' && e.key && e.key.toLowerCase() === 'm') return; // 'M' is the music shortcut
   if (spotify) spotify.play();               // inside the click itself = allowed to play sound
   else loadSpotify();
@@ -159,9 +181,28 @@ function startMusic(e) {
 EVENTS.forEach(t => addEventListener(t, startMusic, { capture: true, passive: true }));
 
 function toggleMusic() {
-  if (spotify) { spotify.togglePlay(); started = true; }
-  else { wantPlay = true; loadSpotify(); }
+  if (!spotify) { wantPlay = true; loadSpotify(); return; }
+  if (!started) spotify.play(); else spotify.togglePlay();
 }
+
+// island controls
+island.addEventListener('click', e => {
+  const btn = e.target.closest('button');
+  if (!btn) { if (island.classList.contains('is-compact')) toggleMusic(); return; }
+  if (btn.id === 'isl-play') toggleMusic();
+  else if (spotify && (btn.id === 'isl-back' || btn.id === 'isl-fwd')) {
+    const now = track.pos + (track.playing ? performance.now() - track.at : 0);
+    const to = Math.max(0, Math.min(track.dur - 1000, now + (btn.id === 'isl-fwd' ? 10000 : -10000)));
+    spotify.seek(to / 1000); track.pos = to; track.at = performance.now(); paintProgress();
+  }
+});
+els.bar.addEventListener('click', e => {
+  if (!spotify) return;
+  const r = els.bar.getBoundingClientRect();
+  const to = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)) * track.dur;
+  spotify.seek(to / 1000); track.pos = to; track.at = performance.now(); paintProgress();
+});
+paintProgress();
 
 
 /* ---------- Terminal traffic lights (macOS style) ----------
