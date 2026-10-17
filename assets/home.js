@@ -97,6 +97,8 @@ const card = document.getElementById('music-card');
 const statusEl = document.getElementById('music-status');
 const hint = document.getElementById('music-hint');
 let spotify = null, started = false, wantPlay = false, apiRequested = false;
+const START_AT = 7;        // seconds: skip the intro on the first play
+let introSkipped = false;
 
 window.onSpotifyIframeApiReady = (IFrameAPI) => {
   IFrameAPI.createController(
@@ -108,6 +110,11 @@ window.onSpotifyIframeApiReady = (IFrameAPI) => {
       if (frame) frame.title = 'Spotify player: Blinding Lights by The Weeknd';
       controller.addListener('playback_update', e => {
         const playing = !e.data.isPaused;
+        // first time the song plays, jump to 0:07 (only once, so replays/seeks are left alone)
+        if (playing && !introSkipped) {
+          introSkipped = true;
+          if (e.data.position < (START_AT - 1) * 1000) controller.seek(START_AT);
+        }
         card.classList.toggle('playing', playing);
         statusEl.textContent = playing ? 'Now playing' : 'On repeat';
         if (playing) { started = true; hint.textContent = 'Blinding Lights · The Weeknd'; }
