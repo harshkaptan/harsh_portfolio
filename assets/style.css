@@ -574,24 +574,17 @@ h2 { flex-wrap: wrap; row-gap: 4px; }
 :root[data-theme="light"] .tip.mac::after { border-color: rgba(0,0,0,.1); }
 
 /* ---------- Router views ----------
-   On /favourites the home content is hidden, EXCEPT the music card, which
-   floats as a mini player. The Spotify iframe is never hidden or moved in
-   the DOM, so the song keeps playing across every section. */
+   On /favourites the home content is hidden. The music card is kept
+   in the viewport at full size but fully transparent and behind the page,
+   so visitors don't see it, yet the Spotify iframe is never hidden, moved
+   or shrunk, and the song keeps playing across every section. */
 #home.fav-mode { min-height: 0 !important; border: 0 !important; }
 #home.fav-mode > :not(#about),
 #home.fav-mode #about > :not(.about-grid),
-#home.fav-mode .about-grid > :not(.music-card),
-#home.fav-mode .music-hint { display: none !important; }
-#home.fav-mode #about { padding: 0 !important; opacity: 1 !important; transform: none !important; }
+#home.fav-mode .about-grid > :not(.music-card) { display: none !important; }
+#home.fav-mode #about { padding: 0 !important; transform: none !important; }
 #home.fav-mode .about-grid { display: block; margin: 0; }
 #home.fav-mode .music-card {
-  position: fixed; z-index: 55; right: 20px; bottom: 24px; width: 320px;
-  padding: 10px; gap: 6px; box-shadow: 0 16px 40px rgba(0,0,0,.35);
-  animation: mini-in .25s ease-out;
+  position: fixed; right: 0; bottom: 0; width: 320px; z-index: -1;
+  opacity: 0; pointer-events: none;
 }
-#home.fav-mode .music-card iframe { height: 80px !important; }
-@keyframes mini-in { from { opacity: 0; transform: translateY(12px); } }
-@media (max-width: 1000px) {
-  #home.fav-mode .music-card { left: 12px; right: 12px; bottom: 76px; width: auto; }
-}
-@media (max-width: 1000px) { #fav-view { padding-bottom: 130px; } }
