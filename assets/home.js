@@ -132,19 +132,23 @@ function loadSpotify() {
   s.async = true;
   document.head.appendChild(s);
 }
-new IntersectionObserver((entries, obs) => {
-  if (entries.some(e => e.isIntersecting)) { loadSpotify(); obs.disconnect(); }
-}, { threshold: 0.5 }).observe(card);
+// Load the player as soon as the page has loaded, so it is ready before the
+// visitor's first click. Browsers (Safari especially) only allow sound when
+// play() runs during that click, so the player must already exist by then.
+if (document.readyState === 'complete') loadSpotify();
+else addEventListener('load', () => loadSpotify(), { once: true });
 
 function startMusic(e) {
   if (started) return;
   if (e && e.target.closest && e.target.closest('#spotify-embed')) return; // let the embed handle its own clicks
   if (e && e.type === 'keydown' && e.key && e.key.toLowerCase() === 'm') return; // 'M' is the music shortcut; let it handle play
-  ['pointerdown', 'keydown', 'touchstart'].forEach(t => removeEventListener(t, startMusic));
   wantPlay = true;
-  if (spotify) { spotify.play(); started = true; } else loadSpotify();
+  if (!spotify) { loadSpotify(); return; } // keep listening: the next tap will start it
+  spotify.play();                          // called inside the click itself = allowed to play sound
+  started = true;
+  ['pointerdown', 'pointerup', 'click', 'keydown', 'touchend'].forEach(t => removeEventListener(t, startMusic, true));
 }
-['pointerdown', 'keydown', 'touchstart'].forEach(t => addEventListener(t, startMusic, { passive: true }));
+['pointerdown', 'pointerup', 'click', 'keydown', 'touchend'].forEach(t => addEventListener(t, startMusic, { capture: true, passive: true }));
 
 function toggleMusic() {
   if (spotify) { spotify.togglePlay(); started = true; }
