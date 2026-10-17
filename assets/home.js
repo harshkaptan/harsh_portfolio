@@ -195,8 +195,8 @@ function toggleMusic() {
   function render(path, smooth) {
     const target = ROUTES[path];
     const fav = target === 'FAV';
-    // hide home off-screen (not display:none) so the music iframe keeps playing
-    homeMain.classList.toggle('view-off', fav);
+    // keep the music card on screen as a mini player so the song never stops
+    homeMain.classList.toggle('fav-mode', fav);
     favMain.hidden = !fav;
     document.title = fav ? TITLES.fav : TITLES.home;
     document.querySelectorAll('.nav-links a[data-route]').forEach(a => a.classList.toggle('active', a.getAttribute('href') === path && path !== '/'));
