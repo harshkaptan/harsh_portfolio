@@ -89,16 +89,17 @@ const io = new IntersectionObserver(entries => entries.forEach(en => {
 document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 
 /* ---------- Spotify: Blinding Lights ----------
-   Spotify's player is heavy and sets third-party cookies, so it is only
-   loaded when the visitor first interacts or scrolls near the music card.
-   Browsers block audio until an interaction, so the track starts on the
-   first click / tap / key press. */
+   Tries to start playing (from 0:07) the moment the page loads.
+   Browsers decide whether sound may play before the visitor interacts:
+   where they allow it, it just plays; where they block it, it starts on
+   the visitor's first click / tap / key press instead. */
 const card = document.getElementById('music-card');
 const statusEl = document.getElementById('music-status');
 const hint = document.getElementById('music-hint');
-let spotify = null, started = false, wantPlay = false, apiRequested = false;
+let spotify = null, started = false, wantPlay = true, apiRequested = false;
 const START_AT = 7;        // seconds: skip the intro on the first play
 let introSkipped = false;
+const EVENTS = ['pointerdown', 'pointerup', 'click', 'keydown', 'touchend'];
 
 window.onSpotifyIframeApiReady = (IFrameAPI) => {
   IFrameAPI.createController(
@@ -117,9 +118,21 @@ window.onSpotifyIframeApiReady = (IFrameAPI) => {
         }
         card.classList.toggle('playing', playing);
         statusEl.textContent = playing ? 'Now playing' : 'On repeat';
-        if (playing) { started = true; hint.textContent = 'Blinding Lights · The Weeknd'; }
+        if (playing && !started) {
+          started = true;
+          hint.textContent = 'Blinding Lights · The Weeknd';
+          EVENTS.forEach(t => removeEventListener(t, startMusic, true));
+        }
       });
-      controller.addListener('ready', () => { if (wantPlay && !started) { controller.play(); started = true; } });
+      // autoplay: only try when this browser allows sound without a click.
+      // (A blocked play() leaves Spotify's player stuck, so we check first
+      // with a tiny silent clip; otherwise the first click starts it.)
+      controller.addListener('ready', () => {
+        if (!wantPlay || started) return;
+        const probe = new Audio('/assets/silence.wav');
+        const ok = probe.play();
+        if (ok && ok.then) ok.then(() => { probe.pause(); if (!started) controller.play(); }).catch(() => {});
+      });
     }
   );
 };
@@ -132,23 +145,18 @@ function loadSpotify() {
   s.async = true;
   document.head.appendChild(s);
 }
-// Load the player as soon as the page has loaded, so it is ready before the
-// visitor's first click. Browsers (Safari especially) only allow sound when
-// play() runs during that click, so the player must already exist by then.
-if (document.readyState === 'complete') loadSpotify();
-else addEventListener('load', () => loadSpotify(), { once: true });
+// load the player straight away so it can start as early as possible
+loadSpotify();
 
+// fallback: if the browser blocked autoplay, the first interaction starts it
 function startMusic(e) {
   if (started) return;
   if (e && e.target.closest && e.target.closest('#spotify-embed')) return; // let the embed handle its own clicks
-  if (e && e.type === 'keydown' && e.key && e.key.toLowerCase() === 'm') return; // 'M' is the music shortcut; let it handle play
-  wantPlay = true;
-  if (!spotify) { loadSpotify(); return; } // keep listening: the next tap will start it
-  spotify.play();                          // called inside the click itself = allowed to play sound
-  started = true;
-  ['pointerdown', 'pointerup', 'click', 'keydown', 'touchend'].forEach(t => removeEventListener(t, startMusic, true));
+  if (e && e.type === 'keydown' && e.key && e.key.toLowerCase() === 'm') return; // 'M' is the music shortcut
+  if (spotify) spotify.play();               // inside the click itself = allowed to play sound
+  else loadSpotify();
 }
-['pointerdown', 'pointerup', 'click', 'keydown', 'touchend'].forEach(t => addEventListener(t, startMusic, { capture: true, passive: true }));
+EVENTS.forEach(t => addEventListener(t, startMusic, { capture: true, passive: true }));
 
 function toggleMusic() {
   if (spotify) { spotify.togglePlay(); started = true; }
