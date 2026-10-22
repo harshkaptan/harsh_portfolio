@@ -151,6 +151,7 @@ window.onSpotifyIframeApiReady = (IFrameAPI) => {
       // with a tiny silent clip; otherwise the first click starts it.)
       controller.addListener('ready', () => {
         if (!wantPlay || started) return;
+        if (interacted) { controller.play(); return; }
         const probe = new Audio('/assets/silence.wav');
         const ok = probe.play();
         if (ok && ok.then) ok.then(() => { probe.pause(); if (!started) controller.play(); }).catch(() => {});
@@ -167,20 +168,32 @@ function loadSpotify() {
   s.async = true;
   document.head.appendChild(s);
 }
-// load the player straight away so it can start as early as possible
-loadSpotify();
+// When to load Spotify's (heavy) player:
+//  - straight away if this browser allows sound without a click (true autoplay);
+//  - otherwise on the visitor's first interaction, or once the page has been idle
+//    for a few seconds, so it never slows down the first paint.
+let interacted = false;
+(function scheduleSpotify() {
+  const probe = new Audio('/assets/silence.wav');
+  const ok = probe.play();
+  const later = () => setTimeout(() => (window.requestIdleCallback || setTimeout)(loadSpotify), 6000);
+  if (ok && ok.then) ok.then(() => { probe.pause(); loadSpotify(); }).catch(later);
+  else later();
+})();
 
 // fallback: if the browser blocked autoplay, the first interaction starts it
 function startMusic(e) {
   if (started) return;
   if (e && e.target.closest && e.target.closest('#island')) return;     // the island handles its own taps
   if (e && e.type === 'keydown' && e.key && e.key.toLowerCase() === 'm') return; // 'M' is the music shortcut
+  interacted = true;
   if (spotify) spotify.play();               // inside the click itself = allowed to play sound
-  else loadSpotify();
+  else loadSpotify();                        // plays as soon as it's ready
 }
 EVENTS.forEach(t => addEventListener(t, startMusic, { capture: true, passive: true }));
 
 function toggleMusic() {
+  interacted = true;
   if (!spotify) { wantPlay = true; loadSpotify(); return; }
   if (!started) spotify.play(); else spotify.togglePlay();
 }

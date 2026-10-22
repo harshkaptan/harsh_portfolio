@@ -16,7 +16,7 @@ Then open http://localhost:5173. Clean routes like `/favourites` need Vercel's r
 
 Works as-is on Vercel, Netlify or Cloudflare Pages. `vercel.json` (Vercel) and `_headers` / `_redirects` (Netlify, Cloudflare Pages) set clean URLs, security and caching headers.
 
-When you edit `assets/style.css`, `common.js` or `home.js`, bump the `?v=` value in `index.html` so visitors get the new file.
+After editing `assets/style.css`, `common.js` or `home.js`, run `python3 scripts/build.py`. It inlines the CSS into `index.html` (faster first paint) and stamps fresh `?v=` versions on the scripts.
 
 ## Structure
 
