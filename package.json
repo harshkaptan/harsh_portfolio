@@ -1,0 +1,8 @@
+{
+  "name": "harsh-portfolio",
+  "private": true,
+  "description": "Static portfolio; dependencies are only for the /api/views counter function.",
+  "dependencies": {
+    "redis": "^4.7.0"
+  }
+}
