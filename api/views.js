@@ -7,10 +7,23 @@
 const KEY = 'portfolio:views';
 const START = 347;
 
+// Vercel may add a custom prefix to the variable names (e.g. STORAGE_KV_REST_API_URL),
+// so accept any *_KV_REST_API_URL / *_REDIS_REST_URL with its matching token.
+function redisEnv() {
+  const env = process.env;
+  const pairs = [['KV_REST_API_URL', 'KV_REST_API_TOKEN'], ['UPSTASH_REDIS_REST_URL', 'UPSTASH_REDIS_REST_TOKEN']];
+  for (const [u, t] of pairs) {
+    const urlKey = Object.keys(env).find(k => k === u || k.endsWith('_' + u));
+    if (!urlKey) continue;
+    const tokenKey = urlKey.slice(0, urlKey.length - u.length) + t;
+    if (env[urlKey] && env[tokenKey]) return { url: env[urlKey], token: env[tokenKey] };
+  }
+  return {};
+}
+
 module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
-  const url = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
-  const token = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
+  const { url, token } = redisEnv();
   if (!url || !token) return res.status(503).json({ error: 'counter storage not connected' });
 
   const count = req.method === 'POST';
