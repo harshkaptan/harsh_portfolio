@@ -5,12 +5,95 @@ const CALENDAR_URL = 'https://cal.com/harsh-kaptan-vn7q9v/secret';
 const EMAIL = 'harshkaptan@gmail.com';
 const SPOTIFY_TRACK = 'spotify:track:0VjIjW4GlUZAMYd2vXMi3b'; // Blinding Lights — The Weeknd
 
-/* ---------- Theme toggle ---------- */
-document.querySelectorAll('.theme-toggle').forEach(btn => btn.addEventListener('click', () => {
-  const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-  document.documentElement.setAttribute('data-theme', next);
-  try { localStorage.setItem('theme', next); } catch (e) {}
-}));
+/* ---------- Sounds ----------
+   Synthesised with Web Audio (no audio files), modelled on samworks.vercel.app:
+   - click():   a soft 45 ms "tick" for links and buttons
+   - shutter(): a camera-shutter snap for the theme switch */
+const sfx = (function () {
+  let ctx = null;
+  const ac = () => {
+    ctx = ctx || new (window.AudioContext || window.webkitAudioContext)();
+    if (ctx.state === 'suspended') ctx.resume();
+    return ctx;
+  };
+  function click(freq = 1000, len = 0.045) {
+    try {
+      const c = ac(), t = c.currentTime;
+      const osc = c.createOscillator(), gain = c.createGain(), lp = c.createBiquadFilter();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, t);
+      osc.frequency.exponentialRampToValueAtTime(freq * 0.8, t + len);
+      lp.type = 'lowpass'; lp.frequency.setValueAtTime(3000, t); lp.Q.value = 0.7;
+      gain.gain.setValueAtTime(0.15, t);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t + len);
+      osc.connect(lp).connect(gain).connect(c.destination);
+      osc.start(t); osc.stop(t + len + 0.01);
+    } catch (e) {}
+  }
+  function shutter() {
+    try {
+      const c = ac(), t = c.currentTime;
+      const n = Math.floor(0.1 * c.sampleRate), buf = c.createBuffer(1, n, c.sampleRate), d = buf.getChannelData(0);
+      for (let i = 0; i < n; i++) d[i] = Math.random() * 2 - 1;
+      const out = c.createGain(); out.gain.value = 1; out.connect(c.destination);
+      // one filtered noise burst = one shutter blade
+      const blade = (at, hp, bp, q, vol, dur, pan) => {
+        const src = c.createBufferSource(); src.buffer = buf;
+        const h = c.createBiquadFilter(); h.type = 'highpass'; h.frequency.value = hp;
+        const b = c.createBiquadFilter(); b.type = 'bandpass'; b.frequency.value = bp; b.Q.value = q;
+        const g = c.createGain();
+        g.gain.setValueAtTime(0, at); g.gain.linearRampToValueAtTime(vol, at + 0.001); g.gain.exponentialRampToValueAtTime(0.0001, at + dur);
+        const p = c.createStereoPanner ? c.createStereoPanner() : null;
+        src.connect(h).connect(b).connect(g);
+        if (p) { p.pan.value = pan; g.connect(p).connect(out); } else g.connect(out);
+        src.start(at); src.stop(at + dur + 0.005);
+      };
+      blade(t, 5000, 7500, 3.5, 0.25, 0.008, -0.08);          // open
+      blade(t + 0.045, 6000, 6000, 3, 0.18, 0.009, 0.08);     // close
+      // low "body" thump
+      const o = c.createOscillator(), g = c.createGain();
+      o.type = 'sine'; o.frequency.setValueAtTime(300, t); o.frequency.exponentialRampToValueAtTime(90, t + 0.045);
+      g.gain.setValueAtTime(0.035, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.045);
+      o.connect(g).connect(out); o.start(t); o.stop(t + 0.045);
+    } catch (e) {}
+  }
+  return { click, shutter };
+})();
+
+/* ---------- Theme toggle ----------
+   The new theme is revealed by a circle that grows out of the button you
+   pressed (View Transitions API), with a camera-shutter sound.
+   Browsers without View Transitions, or visitors who prefer reduced
+   motion, get an instant switch. */
+(function () {
+  let busy = false;
+  const apply = next => {
+    document.documentElement.setAttribute('data-theme', next);
+    try { localStorage.setItem('theme', next); } catch (e) {}
+  };
+  document.querySelectorAll('.theme-toggle').forEach(btn => btn.addEventListener('click', () => {
+    if (busy) return;
+    const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    sfx.shutter();
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (typeof document.startViewTransition !== 'function' || reduce) { apply(next); return; }
+    busy = true;
+    document.documentElement.classList.add('vt-switching');   // freeze colour fades so the reveal is crisp
+    const vw = window.visualViewport ? visualViewport.width : innerWidth;
+    const vh = window.visualViewport ? visualViewport.height : innerHeight;
+    const r = btn.getBoundingClientRect();
+    const x = r.width ? r.left + r.width / 2 : vw / 2, y = r.height ? r.top + r.height / 2 : vh / 2;
+    const radius = Math.hypot(Math.max(x, vw - x), Math.max(y, vh - y));
+    const vt = document.startViewTransition(() => apply(next));
+    vt.ready.then(() => {
+      document.documentElement.animate(
+        { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${radius}px at ${x}px ${y}px)`] },
+        { duration: 650, easing: 'ease-in-out', fill: 'forwards', pseudoElement: '::view-transition-new(root)' }
+      );
+    }).catch(() => {});
+    vt.finished.finally(() => { busy = false; document.documentElement.classList.remove('vt-switching'); });
+  }));
+})();
 
 /* ---------- Booking ---------- */
 const modal = document.getElementById('booking-modal');
@@ -31,40 +114,17 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal()
 }
 
 /* ---------- Click sound ----------
-   A short, soft "tick" (like a trackpad click) synthesised with Web Audio,
-   played whenever a link or button is pressed. No audio file needed. */
+   A soft "tick" whenever a link or button is pressed (the theme toggle
+   plays its own shutter sound instead). */
 (function () {
-  let ctx = null;
-  function tick() {
-    try {
-      ctx = ctx || new (window.AudioContext || window.webkitAudioContext)();
-      if (ctx.state === 'suspended') ctx.resume();
-      const t = ctx.currentTime;
-      // body of the click: a quick high sine that drops in pitch
-      const osc = ctx.createOscillator(), gain = ctx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(2400, t);
-      osc.frequency.exponentialRampToValueAtTime(900, t + 0.04);
-      gain.gain.setValueAtTime(0.0001, t);
-      gain.gain.exponentialRampToValueAtTime(0.18, t + 0.002);
-      gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.06);
-      osc.connect(gain).connect(ctx.destination);
-      osc.start(t); osc.stop(t + 0.07);
-      // crisp transient: a few ms of filtered noise
-      const len = Math.floor(ctx.sampleRate * 0.012);
-      const buf = ctx.createBuffer(1, len, ctx.sampleRate), d = buf.getChannelData(0);
-      for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len) ** 3;
-      const noise = ctx.createBufferSource(), hp = ctx.createBiquadFilter(), ng = ctx.createGain();
-      noise.buffer = buf; hp.type = 'highpass'; hp.frequency.value = 3000; ng.gain.value = 0.25;
-      noise.connect(hp).connect(ng).connect(ctx.destination);
-      noise.start(t);
-    } catch (e) {}
-  }
+  const skip = el => el.closest('.theme-toggle');
   document.addEventListener('pointerdown', e => {
-    if (e.button === 0 && e.target.closest('a, button')) tick();
+    const el = e.button === 0 && e.target.closest('a, button');
+    if (el && !skip(el)) sfx.click();
   });
   document.addEventListener('keydown', e => {
-    if (e.key === 'Enter' && document.activeElement && document.activeElement.matches('a, button')) tick();
+    const el = document.activeElement;
+    if (e.key === 'Enter' && el && el.matches('a, button') && !skip(el)) sfx.click();
   });
 })();
 
