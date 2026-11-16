@@ -141,7 +141,26 @@ nav.top .inner {
   border: 4px solid var(--bg); box-shadow: 0 0 0 1px var(--border), var(--shadow);
   background: var(--surface-2);
 }
-.avatar img { width: 100%; height: 100%; object-fit: cover; }
+/* flip card: illustration on the front, real photo on the back */
+button.avatar { padding: 0; cursor: pointer; perspective: 900px; font: inherit; color: inherit; display: block; }
+.avatar-inner {
+  position: relative; display: block; width: 100%; height: 100%;
+  transform-style: preserve-3d; transition: transform .75s cubic-bezier(.3, 1.35, .45, 1);
+}
+.avatar.flipped .avatar-inner { transform: rotateY(180deg); }
+.avatar .face { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.avatar .back { transform: rotateY(180deg); }
+button.avatar:hover .avatar-inner { transform: rotateY(-12deg); }
+button.avatar.flipped:hover .avatar-inner { transform: rotateY(168deg); }
+button.avatar:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.flip-btn {
+  display: inline-grid; place-items: center; width: 22px; height: 22px; margin-right: 8px; vertical-align: -6px;
+  border: 0; border-radius: 50%; background: none; color: var(--text); cursor: pointer; transition: transform .45s cubic-bezier(.3,1.35,.45,1);
+}
+.flip-btn svg { width: 15px; height: 15px; }
+.flip-btn:hover { background: var(--surface-2); }
+.flip-btn.on { transform: rotate(180deg); }
+@media (prefers-reduced-motion: reduce) { .avatar-inner, .flip-btn { transition: none; } }
 .hero-meta { flex: 1; min-width: 0; padding-bottom: 4px; }
 .whoami { font-size: 13px; color: var(--muted); }
 .views { display: inline-flex; align-items: center; gap: 5px; margin-left: 10px; color: var(--muted); font-variant-numeric: tabular-nums; }

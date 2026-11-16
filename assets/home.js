@@ -328,3 +328,22 @@ paintProgress();
   const play = () => { const p = v.play(); if (p) p.catch(() => {}); };
   new IntersectionObserver(([e]) => (e.isIntersecting ? play() : v.pause())).observe(v);
 })();
+
+/* ---------- Profile photo flip ----------
+   Click the avatar, the ◐ button or press P to flip between the
+   illustration and the real photo. */
+(function () {
+  const card = document.getElementById('avatar-flip');
+  const btn = document.getElementById('flip-btn');
+  if (!card) return;
+  function flip() {
+    const on = !card.classList.contains('flipped');
+    card.classList.toggle('flipped', on);
+    card.setAttribute('aria-pressed', String(on));
+    card.setAttribute('aria-label', on ? 'Flip back to the illustration' : 'Flip to my real photo');
+    if (btn) btn.classList.toggle('on', on);
+  }
+  card.addEventListener('click', flip);
+  if (btn) btn.addEventListener('click', flip);
+  window.__flipAvatar = flip;
+})();

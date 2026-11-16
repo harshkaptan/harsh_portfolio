@@ -255,6 +255,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal()
       { label: 'Toggle theme', icon: I.sun, keys: ['D'], run: () => document.querySelector('.theme-toggle').click(), kw: 'dark light mode' },
       ...(onHome ? [
         { label: 'Play / pause music', icon: I.music, keys: ['M'], run: () => toggleMusic(), kw: 'spotify blinding lights' },
+        { label: 'Flip profile photo', icon: I.user, keys: ['P'], run: () => { top(); setTimeout(() => window.__flipAvatar && window.__flipAvatar(), 350); }, kw: 'avatar real photo picture' },
         { label: 'Wake the cat', icon: I.cat, run: () => { top(); setTimeout(() => { const c = document.getElementById('cat'); c.scrollIntoView({ behavior: 'smooth', block: 'center' }); setTimeout(() => c.click(), 600); }, 50); } },
       ] : []),
       { label: 'Scroll to top', icon: I.up, keys: ['Shift', '↑'], run: () => scrollTo({ top: 0, behavior: 'smooth' }) },
@@ -320,6 +321,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal()
     if (e.key === '/') { e.preventDefault(); show(); }
     else if (e.key.toLowerCase() === 'd' && !e.shiftKey) document.querySelector('.theme-toggle').click();
     else if (e.key.toLowerCase() === 'm' && !e.shiftKey && typeof toggleMusic === 'function') toggleMusic();
+    else if (e.key.toLowerCase() === 'p' && !e.shiftKey && window.__flipAvatar) window.__flipAvatar();
     else if (e.key === 'ArrowUp' && e.shiftKey) { e.preventDefault(); scrollTo({ top: 0, behavior: 'smooth' }); }
   });
 })();
