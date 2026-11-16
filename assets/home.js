@@ -15,41 +15,45 @@
 })();
 
 /* ---------- View counter ----------
-   Counts every page load on the live site, using the free Abacus counter API.
-   That service can be slow (10s+) or briefly fail, so the number shows
-   instantly from the last known count and updates when the API answers.
-   Local previews only read the number so testing doesn't inflate it. */
+   Counts every page load on the live site with our own counter
+   (/api/views on Vercel, stored in Upstash Redis). If that isn't
+   available, it falls back to the free Abacus counter API.
+   The number shows instantly from the last known count and updates when
+   the counter answers. Local previews only read, so testing doesn't count. */
 (function () {
-  const API = 'https://abacus.jasoncameron.dev';
+  const ABACUS = 'https://abacus.jasoncameron.dev';
   const KEY = 'harshkaptan-portfolio/visitors';
   const el = document.getElementById('view-count');
   if (!el) return;
   const isLocal = ['localhost', '127.0.0.1', ''].includes(location.hostname);
-  const action = isLocal ? 'get' : 'hit';
   const show = n => { el.textContent = Number(n).toLocaleString('en-US'); };
 
   // 1) show something right away: this browser's last count, else the baseline in the HTML
   let cached = null;
   try { cached = parseInt(localStorage.getItem('hk-views'), 10); } catch (e) {}
-  const base = parseInt(el.dataset.fallback, 10) || 0;
-  show(Math.max(cached || 0, base));
+  show(Math.max(cached || 0, parseInt(el.dataset.fallback, 10) || 0));
 
-  // 2) ask the API (with a timeout and one retry), then show the live number
-  async function ask(path) {
+  async function getJSON(url, opts = {}, ms = 8000) {
     const ctrl = new AbortController();
-    const t = setTimeout(() => ctrl.abort(), 25000);
+    const t = setTimeout(() => ctrl.abort(), ms);
     try {
-      const res = await fetch(`${API}/${path}/${KEY}`, { signal: ctrl.signal, cache: 'no-store' });
+      const res = await fetch(url, { ...opts, signal: ctrl.signal, cache: 'no-store' });
       if (!res.ok) throw new Error(res.status);
       const data = await res.json();
       if (typeof data.value !== 'number') throw new Error('bad');
       return data.value;
     } finally { clearTimeout(t); }
   }
+
+  // 2) our own counter first, then the old free one as a backup
   (async () => {
     let value = null;
-    try { value = await ask(action); }
-    catch (e) { try { value = await ask('get'); } catch (e2) {} }   // retry read-only, so one visit is never counted twice
+    try { value = await getJSON('/api/views', { method: isLocal ? 'GET' : 'POST' }); }
+    catch (e) {
+      const action = isLocal ? 'get' : 'hit';
+      try { value = await getJSON(`${ABACUS}/${action}/${KEY}`, {}, 25000); }
+      catch (e2) { try { value = await getJSON(`${ABACUS}/get/${KEY}`, {}, 25000); } catch (e3) {} }
+    }
     if (value == null) return;               // keep the instant number on screen
     show(value);
     try { localStorage.setItem('hk-views', String(value)); } catch (e) {}

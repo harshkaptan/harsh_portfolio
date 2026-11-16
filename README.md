@@ -23,3 +23,4 @@ After editing `assets/style.css`, `common.js` or `home.js`, run `python3 scripts
 - `index.html`: the whole site in one page. Clean routes (`/about`, `/work`, `/projects`, `/contact`, `/favourites`) switch views without reloading, so the music keeps playing.
 - `harsh-kaptan.md`: plain-text version of the portfolio (used by the ⌘K "Open in Markdown" command)
 - `assets/`: styles, scripts, fonts, icons and images
+- `api/views.js`: page-view counter (Vercel Function + Upstash Redis). Connect Upstash for Redis to the project in Vercel → Storage; until then the site falls back to the free Abacus counter.
