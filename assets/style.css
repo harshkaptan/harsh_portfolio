@@ -564,89 +564,66 @@ body.cmdk-lock { overflow: hidden; }
   .dock .sep { height: 24px; margin: 4px 1px 0; }
 }
 
-/* ---------- Favourites page ---------- */
+/* ---------- Favourites (styled after samworks.vercel.app/favourites) ---------- */
+@font-face { font-family: 'Instrument Serif'; src: url('fonts/InstrumentSerif-Regular.woff2') format('woff2'); font-weight: 400; font-display: swap; }
+@font-face { font-family: 'Inter'; src: url('fonts/Inter-Variable.woff2') format('woff2'); font-weight: 100 900; font-display: swap; }
 .nav-links a.active { color: var(--text); }
-.fav-head { padding: 22px 28px; border-bottom: 1px solid var(--edge); position: relative; }
-.fav-title { font-family: 'GeistPixelGrid', 'Geist Mono', monospace; font-weight: 400; font-size: 32px; letter-spacing: -.01em; line-height: 1.2; }
-.fav-intro { padding: 18px 28px; border-bottom: 1px solid var(--edge); color: var(--muted); font-size: 14.5px; max-width: 640px; }
-.fav-head::after, .fav-intro::after, .fav-group::after, .fav-grid::after {
+.fav-back-row { padding: 18px 28px; border-bottom: 1px solid var(--edge); position: relative; }
+.fav-back {
+  display: inline-flex; align-items: center; gap: 8px; color: var(--muted);
+  font: 500 13px 'Geist Mono', monospace; text-transform: uppercase; letter-spacing: .08em; transition: color .2s, gap .2s;
+}
+.fav-back svg { width: 15px; height: 15px; }
+.fav-back:hover { color: var(--text); gap: 11px; }
+.fav-head { padding: 30px 28px 26px; border-bottom: 1px solid var(--edge); position: relative; }
+.fav-title { font-family: 'Instrument Serif', Georgia, serif; font-weight: 400; font-size: 48px; letter-spacing: -1.2px; line-height: 1.05; }
+.fav-sub { margin-top: 8px; color: var(--muted); font-family: 'Inter', 'Geist', sans-serif; font-size: 15px; line-height: 1.6; max-width: 560px; }
+.fav-back-row::after, .fav-head::after, .fav-group::after {
   content: ""; position: absolute; left: -100vw; right: -100vw; bottom: -1px; height: 1px; background: var(--edge); pointer-events: none;
 }
-.fav-intro, .fav-grid { position: relative; }
 .fav-group {
-  position: relative; display: flex; align-items: center; gap: 10px;
-  padding: 14px 28px; border-bottom: 1px solid var(--edge); font-weight: 500; font-size: 15px;
+  position: relative; display: flex; align-items: center; gap: 9px; margin-top: 34px;
+  padding: 12px 28px; border-top: 1px dashed var(--border); border-bottom: 1px dashed var(--border);
+  font: 600 12px 'Inter', 'Geist', sans-serif; letter-spacing: .02em; color: var(--muted);
 }
-.fav-group svg { width: 17px; height: 17px; color: var(--muted); }
-.fav-grid { display: grid; grid-template-columns: repeat(3, 1fr); border-bottom: 1px solid var(--edge); }
-.fav-card {
-  display: flex; flex-direction: column; gap: 10px; padding: 12px;
-  border-right: 1px solid var(--edge); border-bottom: 1px solid var(--edge); margin-bottom: -1px;
+.fav-group::after { display: none; }
+.fav-group svg { width: 15px; height: 15px; }
+.fav-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 26px 28px 8px; justify-items: center; }
+.fav-card { display: block; border-radius: 3px; outline-offset: 4px; }
+.fav-poster {
+  position: relative; display: block; width: 192px; height: 288px; overflow: hidden; border-radius: 3px;
+  border: 1px solid #272727; background: rgba(23,23,23,.4); cursor: pointer;
 }
-.fav-card:nth-child(3n) { border-right: 0; }
-.fav-card img {
-  width: 100%; height: auto; aspect-ratio: 2 / 3; object-fit: cover; border-radius: 10px;
-  border: 1px solid var(--border); background: var(--surface-2);
-  transition: transform .25s ease, box-shadow .25s ease;
+:root[data-theme="light"] .fav-poster { border-color: #e5e5e5; background: #fafafa; }
+.fav-poster img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform .5s ease; }
+.fav-shade {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: 0; transition: opacity .3s;
+  background: linear-gradient(to top, rgba(0,0,0,.8), rgba(0,0,0,.4) 50%, transparent);
 }
-.fav-card:hover img { transform: translateY(-3px); box-shadow: var(--shadow); }
-.fav-name { font-size: 13.5px; color: var(--muted); padding: 0 2px; transition: color .2s; }
-.fav-card:hover .fav-name { color: var(--text); }
+.fav-info {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; padding: 16px; pointer-events: none;
+  display: flex; flex-direction: column; align-items: center; gap: 2px; text-align: center;
+  opacity: 0; transform: translateY(16px); transition: opacity .3s ease-out, transform .3s ease-out;
+}
+.fav-t { font: 700 14px/1.2 'Inter', 'Geist', sans-serif; color: #fff; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.fav-by { font: 500 10px 'Inter', 'Geist', sans-serif; color: #d4d4d4; opacity: .85; }
+.fav-plot { margin-top: 4px; padding: 0 4px; font: 9px/1.35 'Geist Mono', monospace; letter-spacing: -.01em; color: #a3a3a3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.fav-card:hover .fav-poster img, .fav-card:focus-visible .fav-poster img { transform: scale(1.05); }
+.fav-card:hover .fav-shade, .fav-card:focus-visible .fav-shade { opacity: 1; }
+.fav-card:hover .fav-info, .fav-card:focus-visible .fav-info { opacity: 1; transform: none; }
+/* touch screens have no hover: keep the title visible */
+@media (hover: none) {
+  .fav-shade { opacity: .9; background: linear-gradient(to top, rgba(0,0,0,.75), transparent 45%); }
+  .fav-info { opacity: 1; transform: none; padding: 10px; }
+  .fav-plot { display: none; }
+}
 @media (max-width: 640px) {
-  .fav-head, .fav-intro, .fav-group { padding-left: 16px; padding-right: 16px; }
-  .fav-grid { grid-template-columns: repeat(2, 1fr); }
-  .fav-card:nth-child(3n) { border-right: 1px solid var(--edge); }
-  .fav-card:nth-child(2n) { border-right: 0; }
-  .fav-card { padding: 10px; }
+  .fav-back-row, .fav-head, .fav-group { padding-left: 16px; padding-right: 16px; }
+  .fav-title { font-size: 40px; }
+  .fav-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; padding: 20px 16px 4px; }
+  .fav-card { width: 100%; max-width: 160px; }
+  .fav-poster { width: 100%; height: auto; aspect-ratio: 2 / 3; }
 }
-
-/* ---------- Contact meme ---------- */
-.cta.has-meme {
-  display: grid; grid-template-columns: 236px 1fr; gap: 32px; align-items: center;
-  text-align: left; padding: 30px 30px 30px 26px;
-}
-.cta.has-meme .cta-row { justify-content: flex-start; }
-.cta.has-meme h3 { margin-top: 14px; line-height: 1.15; }
-.meme {
-  margin: 0; padding: 8px 8px 0; border-radius: 14px;
-  background: var(--surface-2); border: 1px solid var(--border-strong);
-  box-shadow: 0 12px 26px rgba(0,0,0,.12);
-  transform: rotate(-3deg); transition: transform .35s cubic-bezier(.3,1.6,.5,1);
-}
-.meme:hover { transform: rotate(1.5deg) scale(1.03); }
-.meme img {
-  display: block; width: 100%; height: auto; aspect-ratio: 32 / 25; object-fit: cover; border-radius: 9px;
-  filter: saturate(.85) contrast(1.05);
-}
-:root[data-theme="dark"] .meme { box-shadow: 0 14px 30px rgba(0,0,0,.45); }
-:root[data-theme="dark"] .meme img { filter: saturate(.8) contrast(1.05) brightness(.92); }
-.meme figcaption { padding: 9px 4px 10px; text-align: center; font-size: 12px; color: var(--muted); }
-@media (max-width: 640px) {
-  .cta.has-meme { grid-template-columns: 1fr; gap: 24px; text-align: center; padding: 26px 18px; }
-  .cta.has-meme .cta-row { justify-content: center; }
-  .meme { width: min(250px, 80%); margin: 4px auto 0; }
-}
-
-/* ---------- Heading side note ---------- */
-h2 { flex-wrap: wrap; row-gap: 4px; }
-.h2-note {
-  font-family: 'Geist Mono', monospace; font-size: 13px; font-weight: 400; letter-spacing: 0;
-  color: var(--muted); align-self: center; white-space: nowrap;
-}
-
-/* macOS-style label above dock icons */
-.tip.mac {
-  background: color-mix(in srgb, #2b2b30 82%, transparent); color: #f5f5f5; border: 1px solid rgba(255,255,255,.12);
-  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-  border-radius: 8px; padding: 4px 10px; font-size: 13px; overflow: visible;
-}
-.tip.mac::after {
-  content: ""; position: absolute; left: 50%; bottom: -5px; width: 9px; height: 9px; margin-left: -5px;
-  background: inherit; border-right: 1px solid rgba(255,255,255,.12); border-bottom: 1px solid rgba(255,255,255,.12);
-  transform: rotate(45deg); backdrop-filter: none;
-}
-:root[data-theme="light"] .tip.mac { background: rgba(236,236,240,.88); color: #1c1c1e; border-color: rgba(0,0,0,.1); }
-:root[data-theme="light"] .tip.mac::after { border-color: rgba(0,0,0,.1); }
 
 /* ---------- Router views ----------
    On /favourites the home content is hidden. The music card is kept
