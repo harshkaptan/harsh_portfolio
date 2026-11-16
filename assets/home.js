@@ -16,20 +16,44 @@
 
 /* ---------- View counter ----------
    Counts every page load on the live site, using the free Abacus counter API.
+   That service can be slow (10s+) or briefly fail, so the number shows
+   instantly from the last known count and updates when the API answers.
    Local previews only read the number so testing doesn't inflate it. */
-(async function () {
+(function () {
   const API = 'https://abacus.jasoncameron.dev';
   const KEY = 'harshkaptan-portfolio/visitors';
   const el = document.getElementById('view-count');
+  if (!el) return;
   const isLocal = ['localhost', '127.0.0.1', ''].includes(location.hostname);
   const action = isLocal ? 'get' : 'hit';
-  try {
-    const res = await fetch(`${API}/${action}/${KEY}`);
-    const data = await res.json();
-    el.textContent = typeof data.value === 'number' ? data.value.toLocaleString('en-US') : '0';
-  } catch (e) {
-    el.parentElement.style.display = 'none';
+  const show = n => { el.textContent = Number(n).toLocaleString('en-US'); };
+
+  // 1) show something right away: this browser's last count, else the baseline in the HTML
+  let cached = null;
+  try { cached = parseInt(localStorage.getItem('hk-views'), 10); } catch (e) {}
+  const base = parseInt(el.dataset.fallback, 10) || 0;
+  show(Math.max(cached || 0, base));
+
+  // 2) ask the API (with a timeout and one retry), then show the live number
+  async function ask(path) {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 25000);
+    try {
+      const res = await fetch(`${API}/${path}/${KEY}`, { signal: ctrl.signal, cache: 'no-store' });
+      if (!res.ok) throw new Error(res.status);
+      const data = await res.json();
+      if (typeof data.value !== 'number') throw new Error('bad');
+      return data.value;
+    } finally { clearTimeout(t); }
   }
+  (async () => {
+    let value = null;
+    try { value = await ask(action); }
+    catch (e) { try { value = await ask('get'); } catch (e2) {} }   // retry read-only, so one visit is never counted twice
+    if (value == null) return;               // keep the instant number on screen
+    show(value);
+    try { localStorage.setItem('hk-views', String(value)); } catch (e) {}
+  })();
 })();
 
 /* ---------- Pixel cat ----------
