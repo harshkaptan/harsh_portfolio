@@ -375,7 +375,7 @@ paintProgress();
     body.innerHTML = day
       ? `<circle class="lt-sun" cx="${x}" cy="${y}" r="2.8"/>`
       : `<circle class="lt-moon" cx="${x}" cy="${y}" r="2.8"/><circle class="lt-moon-cut" cx="${(+x + 1.4).toFixed(2)}" cy="${(+y - 1).toFixed(2)}" r="2.4"/>`;
-    document.getElementById('localtime').setAttribute('data-tip', `Your local time · ${day ? 'daytime' : 'night-time'}`);
+    if (window.__ltAvail) window.__ltAvail(now);
   }
   tick();
   setTimeout(function again() { tick(); setTimeout(again, 60000 - (Date.now() % 60000) + 50); }, 60000 - (Date.now() % 60000) + 50);
@@ -389,4 +389,84 @@ paintProgress();
     if (!g || (!g.city && !g.country)) return;
     placeEl.textContent = [g.city, g.country && countryName(g.country)].filter(Boolean).join(', ');
   }).catch(() => {});
+})();
+
+/* ---------- Availability card on the time pill (after xevrion.dev) ----------
+   Hover (or tap) the pill and it grows into a card saying whether I'm free
+   to talk right now, based on my calling hours in India time, converted to
+   the visitor's own time. */
+(function () {
+  const wrap = document.getElementById('lt-wrap');
+  const card = document.getElementById('lt-card');
+  const pill = document.getElementById('localtime');
+  const statusEl = document.getElementById('lt-status');
+  const noteEl = document.getElementById('lt-note');
+  if (!wrap || !card || !pill) return;
+
+  // ---- my calling hours (24h clock, India time) ----
+  const MY_TZ = 'Asia/Kolkata', FROM = 10, TO = 22;
+
+  const minutesIn = (tz, d) => {
+    const p = new Intl.DateTimeFormat('en-GB', { timeZone: tz, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).formatToParts(d);
+    const v = t => Number(p.find(x => x.type === t).value);
+    return v('hour') * 60 + v('minute');
+  };
+  const short = d => new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit', hour12: true }).format(d)
+    .replace(/:00/, '').replace(/\s?([AP])\.?M\.?/i, (m, a) => a.toLowerCase() + 'm').replace(/\s/g, '');
+  const label = h => (h % 12 || 12) + (h < 12 || h === 24 ? 'am' : 'pm');
+
+  window.__ltAvail = now => {
+    const mine = minutesIn(MY_TZ, now), from = FROM * 60, to = TO * 60;
+    const free = mine >= from && mine < to;
+    let text = 'Free to talk right now';
+    if (!free) {
+      const wait = (from - mine + 1440) % 1440, h = Math.floor(wait / 60), m = wait % 60;
+      text = `Free for calls in ${h ? h + 'h' : ''}${h && m ? ' ' : ''}${m ? m + 'm' : ''}`;
+    }
+    statusEl.textContent = text;
+    // my hours, plus what that is for the visitor if they're in another time zone
+    const visitorTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    let note = `Calls ${label(FROM)} to ${label(TO)}, India time.`;
+    const sameZone = minutesIn(visitorTz, now) === mine;
+    if (!sameZone) {
+      // the moment it's hh:00 in India today, shown on the visitor's own clock
+      const at = hh => short(new Date(now.getTime() - mine * 60000 - now.getSeconds() * 1000 + hh * 3600000));
+      note += ` That's ${at(FROM)} to ${at(TO)} for you.`;
+    }
+    noteEl.textContent = note + ' Booking a slot reaches me fastest.';
+  };
+  window.__ltAvail(new Date());
+
+  // ---- grow / shrink ----
+  let open = false, closeT = null;
+  function measure() {
+    const pw = pill.offsetWidth + 2, ph = pill.offsetHeight + 2;
+    wrap.style.setProperty('--pill-w', pw + 'px');
+    if (!open) {
+      card.style.setProperty('--r', Math.max(0, card.offsetWidth - pw) + 'px');
+      card.style.setProperty('--b', Math.max(0, card.offsetHeight - ph) + 'px');
+    }
+  }
+  function setOpen(v) {
+    open = v;
+    wrap.classList.toggle('open', v);
+    pill.setAttribute('aria-expanded', String(v));
+    if (v) {
+      // keep the card on screen on narrow phones
+      const r = wrap.getBoundingClientRect(), over = r.left + card.offsetWidth - (innerWidth - 16);
+      card.style.setProperty('--shift', over > 0 ? -over + 'px' : '0px');
+      card.style.setProperty('--r', '0px'); card.style.setProperty('--b', '0px');
+    } else { card.style.setProperty('--shift', '0px'); measure(); }
+  }
+  new ResizeObserver(measure).observe(pill);
+  addEventListener('resize', measure);
+  measure();
+
+  wrap.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') { clearTimeout(closeT); setOpen(true); } });
+  wrap.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse') { clearTimeout(closeT); closeT = setTimeout(() => setOpen(false), 120); } });
+  pill.addEventListener('click', e => { if (e.pointerType !== 'mouse') setOpen(!open); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && open) setOpen(false); });
+  document.addEventListener('pointerdown', e => { if (open && !wrap.contains(e.target)) setOpen(false); });
+  wrap.addEventListener('focusout', e => { if (!wrap.contains(e.relatedTarget)) setOpen(false); });
+  // keyboard: Tab to the pill, then Enter/Space opens it (a click with no pointer type)
 })();
