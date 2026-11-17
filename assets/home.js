@@ -404,34 +404,45 @@ paintProgress();
   if (!wrap || !card || !pill) return;
 
   // ---- my calling hours (24h clock, India time) ----
-  const MY_TZ = 'Asia/Kolkata', FROM = 10, TO = 22;
+  // Mon–Fri evenings, Sat–Sun all day. 24 = midnight.
+  const MY_TZ = 'Asia/Kolkata';
+  const WEEKDAY = [19, 24], WEEKEND = [7, 24];
+  const hoursFor = dow => (dow === 0 || dow === 6 ? WEEKEND : WEEKDAY);   // 0 = Sunday
 
-  const minutesIn = (tz, d) => {
-    const p = new Intl.DateTimeFormat('en-GB', { timeZone: tz, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).formatToParts(d);
-    const v = t => Number(p.find(x => x.type === t).value);
-    return v('hour') * 60 + v('minute');
-  };
+  const parts = (tz, d) => new Intl.DateTimeFormat('en-US', { timeZone: tz, hour: '2-digit', minute: '2-digit', hourCycle: 'h23', weekday: 'short' }).formatToParts(d);
+  const minutesIn = (tz, d) => { const p = parts(tz, d); const v = t => Number(p.find(x => x.type === t).value); return (v('hour') % 24) * 60 + v('minute'); };
+  const dayIn = (tz, d) => ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(parts(tz, d).find(x => x.type === 'weekday').value);
   const short = d => new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit', hour12: true }).format(d)
     .replace(/:00/, '').replace(/\s?([AP])\.?M\.?/i, (m, a) => a.toLowerCase() + 'm').replace(/\s/g, '');
-  const label = h => (h % 12 || 12) + (h < 12 || h === 24 ? 'am' : 'pm');
+  const label = h => (h % 24 === 0 ? 'midnight' : (h % 12 || 12) + (h < 12 ? 'am' : 'pm'));
 
   window.__ltAvail = now => {
-    const mine = minutesIn(MY_TZ, now), from = FROM * 60, to = TO * 60;
-    const free = mine >= from && mine < to;
+    const mine = minutesIn(MY_TZ, now), dow = dayIn(MY_TZ, now);
+    const [f, t] = hoursFor(dow);
     let text = 'Free to talk right now';
-    if (!free) {
-      const wait = (from - mine + 1440) % 1440, h = Math.floor(wait / 60), m = wait % 60;
+    if (!(mine >= f * 60 && mine < t * 60)) {
+      // minutes until the next window opens (today or a later day)
+      let wait = Infinity;
+      for (let d = 0; d < 8 && wait === Infinity; d++) {
+        const start = d * 1440 + hoursFor((dow + d) % 7)[0] * 60 - mine;
+        if (start > 0) wait = start;
+      }
+      const h = Math.floor(wait / 60), m = wait % 60;
       text = `Free for calls in ${h ? h + 'h' : ''}${h && m ? ' ' : ''}${m ? m + 'm' : ''}`;
     }
     statusEl.textContent = text;
-    // my hours, plus what that is for the visitor if they're in another time zone
+
+    let note = `Weekdays ${label(WEEKDAY[0])} to ${label(WEEKDAY[1])}, weekends ${label(WEEKEND[0])} to ${label(WEEKEND[1])}, India time.`;
     const visitorTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    let note = `Calls ${label(FROM)} to ${label(TO)}, India time.`;
-    const sameZone = minutesIn(visitorTz, now) === mine;
-    if (!sameZone) {
+    if (minutesIn(visitorTz, now) !== mine) {
       // the moment it's hh:00 in India today, shown on the visitor's own clock
-      const at = hh => short(new Date(now.getTime() - mine * 60000 - now.getSeconds() * 1000 + hh * 3600000));
-      note += ` That's ${at(FROM)} to ${at(TO)} for you.`;
+      const inst = hh => new Date(now.getTime() - mine * 60000 - now.getSeconds() * 1000 + hh * 3600000);
+      // "next day" when the window runs past midnight on the visitor's clock
+      const span = ([f, t]) => {
+        const a = inst(f), b = inst(t), crosses = minutesIn(visitorTz, b) <= minutesIn(visitorTz, a) && minutesIn(visitorTz, b) !== 0;
+        return `${short(a)}–${short(b)}${crosses ? ' next day' : ''}`;
+      };
+      note += ` For you: ${span(WEEKDAY)} on weekdays, ${span(WEEKEND)} at weekends.`;
     }
     noteEl.textContent = note + ' Booking a slot reaches me fastest.';
   };
