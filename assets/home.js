@@ -329,23 +329,26 @@ paintProgress();
   new IntersectionObserver(([e]) => (e.isIntersecting ? play() : v.pause())).observe(v);
 })();
 
-/* ---------- Profile photo flip ----------
-   Click the avatar, the ◐ button or press P to flip between the
-   illustration and the real photo. */
+/* ---------- Profile photo switch ----------
+   The avatar softly crossfades between the illustration and the real
+   photo every 30 seconds. Clicking it (or pressing P) switches straight
+   away and restarts the 30-second timer. Pauses while the tab is hidden. */
 (function () {
   const card = document.getElementById('avatar-flip');
-  const btn = document.getElementById('flip-btn');
   if (!card) return;
-  function flip() {
-    const on = !card.classList.contains('flipped');
-    card.classList.toggle('flipped', on);
-    card.setAttribute('aria-pressed', String(on));
-    card.setAttribute('aria-label', on ? 'Flip back to the illustration' : 'Flip to my real photo');
-    if (btn) btn.classList.toggle('on', on);
+  const EVERY = 30000;
+  let timer = null;
+  function swap() {
+    const real = !card.classList.contains('flipped');
+    card.classList.toggle('flipped', real);
+    card.setAttribute('aria-pressed', String(real));
+    card.setAttribute('aria-label', real ? 'Switch to the illustration' : 'Switch to my real photo');
   }
-  card.addEventListener('click', flip);
-  if (btn) btn.addEventListener('click', flip);
-  window.__flipAvatar = flip;
+  function restart() { clearInterval(timer); timer = setInterval(() => { if (!document.hidden) swap(); }, EVERY); }
+  function manual() { swap(); restart(); }
+  card.addEventListener('click', manual);
+  window.__flipAvatar = manual;
+  restart();
 })();
 
 /* ---------- Visitor's local time ----------
