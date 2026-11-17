@@ -708,3 +708,4 @@ html.vt-switching *, html.vt-switching *::before, html.vt-switching *::after { t
 .pill-btn:hover { background: color-mix(in srgb, var(--surface-2) 70%, var(--text) 10%); }
 .pill-btn:active { transform: scale(.96); }
 .hero .cta-row { margin-top: 20px; }
+.cta-text > h3:first-child { margin-top: 0; }
