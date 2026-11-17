@@ -177,6 +177,18 @@ button.avatar:focus-visible { outline: 2px solid var(--accent); outline-offset: 
   font-size: 13px; color: var(--muted);
   padding: 6px 12px; border: 1px solid var(--border); border-radius: 999px; background: var(--surface);
 }
+.status-row { margin-top: 22px; display: flex; flex-wrap: wrap; gap: 8px; }
+.status-row .status { margin-top: 0; }
+.localtime { gap: 7px; font-variant-numeric: tabular-nums; }
+.lt-place { color: var(--text); font-weight: 500; }
+.lt-sep { color: var(--faint); }
+.lt-sky { width: 30px; height: 16px; flex-shrink: 0; }
+.lt-arc { fill: none; stroke: var(--faint); stroke-width: 1.2; stroke-dasharray: 1.6 2; }
+.lt-ground { stroke: var(--muted); stroke-width: 1.2; stroke-linecap: round; }
+.lt-sun { fill: #f5b301; }
+.lt-moon { fill: var(--text); }
+.lt-moon-cut { fill: var(--surface); }
+.lt-time { min-width: 52px; }
 .intro { margin-top: 22px; color: var(--muted); }
 .intro p + p { margin-top: 10px; }
 .chip-inline {

@@ -347,3 +347,43 @@ paintProgress();
   if (btn) btn.addEventListener('click', flip);
   window.__flipAvatar = flip;
 })();
+
+/* ---------- Visitor's local time ----------
+   Shows the viewer's own city and current time, with a little sky arc:
+   the sun travels across it from 6am to 6pm, the moon from 6pm to 6am.
+   City comes from /api/geo (Vercel's IP-based location); if that isn't
+   available, it's guessed from the browser's time zone. */
+(function () {
+  const placeEl = document.getElementById('lt-place');
+  const timeEl = document.getElementById('lt-time');
+  const body = document.getElementById('lt-body');
+  if (!placeEl || !timeEl || !body) return;
+  const fmt = new Intl.DateTimeFormat(undefined, { hour: 'numeric', minute: '2-digit', hour12: true });
+
+  function tick() {
+    const now = new Date();
+    timeEl.textContent = fmt.format(now).replace(/\s?([AP])\.?M\.?/i, (m, a) => a.toLowerCase() + 'm').replace(/\s/g, '');
+    timeEl.dateTime = now.toISOString();
+    const h = now.getHours() + now.getMinutes() / 60;
+    const day = h >= 6 && h < 18;
+    const p = day ? (h - 6) / 12 : ((h - 18 + 24) % 24) / 12;      // 0 → 1 across the arc
+    const a = Math.PI * (1 - p);
+    const x = (15 + 11 * Math.cos(a)).toFixed(2), y = (14 - 11 * Math.sin(a)).toFixed(2);
+    body.innerHTML = day
+      ? `<circle class="lt-sun" cx="${x}" cy="${y}" r="2.8"/>`
+      : `<circle class="lt-moon" cx="${x}" cy="${y}" r="2.8"/><circle class="lt-moon-cut" cx="${(+x + 1.4).toFixed(2)}" cy="${(+y - 1).toFixed(2)}" r="2.4"/>`;
+    document.getElementById('localtime').setAttribute('data-tip', `Your local time · ${day ? 'daytime' : 'night-time'}`);
+  }
+  tick();
+  setTimeout(function again() { tick(); setTimeout(again, 60000 - (Date.now() % 60000) + 50); }, 60000 - (Date.now() % 60000) + 50);
+
+  // place: guess from time zone first (instant), then refine with the real city
+  const tz = (Intl.DateTimeFormat().resolvedOptions().timeZone || '').split('/').pop().replace(/_/g, ' ');
+  const tzCity = ({ Calcutta: 'Kolkata', Saigon: 'Ho Chi Minh City', Kiev: 'Kyiv' })[tz] || tz;
+  if (tzCity) placeEl.textContent = tzCity;
+  const countryName = code => { try { return new Intl.DisplayNames(['en'], { type: 'region' }).of(code); } catch (e) { return code; } };
+  fetch('/api/geo', { cache: 'no-store' }).then(r => (r.ok ? r.json() : null)).then(g => {
+    if (!g || (!g.city && !g.country)) return;
+    placeEl.textContent = [g.city, g.country && countryName(g.country)].filter(Boolean).join(', ');
+  }).catch(() => {});
+})();
