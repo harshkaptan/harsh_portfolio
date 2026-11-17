@@ -424,6 +424,20 @@ a.exp-logo:hover { transform: translateY(-2px); }
 
 /* ---------- Footer ---------- */
 footer { padding: 18px 28px 0; display: flex; justify-content: space-between; align-items: flex-end; gap: 8px; position: relative; }
+/* closing quote (styled after samworks.vercel.app) */
+.quote-block { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 52px 24px 48px; text-align: center; }
+.quote-mark { width: 30px; height: 30px; fill: var(--faint); transform: rotate(180deg); opacity: .8; }
+.quote-text {
+  max-width: 576px; margin: 0; padding: 0 8px;
+  font: italic 400 30px/1.625 'Inter', 'Geist', sans-serif; letter-spacing: .025em; color: var(--text); opacity: .86;
+}
+.quote-emoji { font-style: normal; }
+.quote-by { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 8px; }
+.quote-by i { width: 32px; height: 1px; background: var(--border-strong); }
+.quote-by span { font: 700 10px 'Geist Mono', monospace; letter-spacing: .25em; text-transform: uppercase; color: var(--muted); }
+/* the cat gets the last word: centred, sitting on the bottom line */
+footer.foot-cat { justify-content: center; padding-top: 28px; }
+@media (max-width: 640px) { .quote-text { font-size: 20px; } .quote-block { padding: 40px 16px 36px; } }
 footer::after { content: ""; position: absolute; left: -100vw; right: -100vw; bottom: 0; height: 1px; background: var(--edge); }
 .foot-text { display: flex; flex-direction: column; font-size: 12px; line-height: 1.5; color: var(--muted); padding-bottom: 14px; }
 .foot-dots {
